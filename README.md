@@ -33,4 +33,15 @@ local losAngelesTime = RoTime.new():timezone("America/Los_Angeles")
 print(losAngelesTime:format("#mm/#d/#yyyy #h:#m #a")) --> 8/2/2022 9:33 PM
 ```
 
+#### Adding / Subtracting
+```lua
+local RoTime = require(game:GetService("ReplicatedStorage"):WaitForChild("RoTime"))
+local oneHourAhead = RoTime.new():add(1, "hour")
+local oneMinuteBehind = RoTime.new():subtract(1, "minute")
+
+-- Assuming right now is 1:36
+print(oneHourAhead:format("#h:#m")) --> 2:36
+print(oneMinuteBehind:format("#h:#m")) --> 1:35
+```
+
 More features are planned to come!

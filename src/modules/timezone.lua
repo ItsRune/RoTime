@@ -29,13 +29,14 @@ local Zones = {
 return function(self, zone)
     local zoneTime = Zones[zone]
     if not zoneTime then
-        return error(debug.traceback("Invalid zone was provided. Please double check your spelling & capitalization!"), 3)
+        return error(debug.traceback("Invalid zone was provided. Please double check your spelling & capitalization!", 2))
     end
 
     local nowGMT = DateTime.now().UnixTimestamp
     --/ Utc and Gmt are the same.
     self._now = nowGMT + math.floor(60 * 60 * zoneTime)
     self._nowdt = nowGMT + math.floor(60 * 60 * zoneTime) * 1000
+    self._timezone = zone
 
     return self
 end

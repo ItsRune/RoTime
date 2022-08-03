@@ -12,6 +12,7 @@ local function Constructor()
 
     time._now = os.time()
     time._nowdt = DateTime.now()
+    time._timezone = "UTC"
 
     return setmetatable(time, mt)
 end
