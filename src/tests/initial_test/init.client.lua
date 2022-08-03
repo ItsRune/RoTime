@@ -8,6 +8,6 @@ ny = ny:timezone("America/New_York")
 cali = cali:timezone("America/Los_Angeles")
 aussie = aussie:timezone("Australia/Sydney")
 
-warn(ny:format("It's currently #mm/#d/#y #h:#m:#s in New York!"))
+warn(ny:format("It's currently #mm/#d/#y #h:#m:#s #a in New York!"))
 warn(cali:format("It's currently #mm/#d/#y #h:#m:#s in California!"))
-warn(aussie:format("It's currently #mm/#d/#y #h:#m:#s in Australia!"))
+warn(aussie:format("It's currently #mm/#d/#y #h:#m:#s #a in Australia!"))

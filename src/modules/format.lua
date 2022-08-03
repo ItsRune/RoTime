@@ -17,6 +17,7 @@ local formattingCodes = {
     ["MMM"] = "month_long";
     ["DD"] = "day_short";
     ["DDD"] = "day_long";
+    ["a"] = "ampm";
 }
 
 local days = {
@@ -68,7 +69,7 @@ local function addAppropriateOutput(codeType, nowTime)
         end
     elseif name == "hour" then
         if type == "12" then
-            return tostring(nowTime.hour % 12)
+            return tostring((nowTime.hour % 12) == 0 and 12 or nowTime.hour % 12)
         elseif type == "24" then
             return tostring(nowTime.hour)
         end
@@ -88,6 +89,12 @@ local function addAppropriateOutput(codeType, nowTime)
         end
     elseif name == "year" then
         return tostring(nowTime.year)
+    elseif name == "ampm" then
+        if nowTime.hour < 12 then
+            return "AM"
+        else
+            return "PM"
+        end
     end
 
     return "Unknown"
