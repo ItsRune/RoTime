@@ -33,4 +33,4 @@ local losAngelesTime = RoTime.new():timezone("America/Los_Angeles")
 print(losAngelesTime:format("#mm/#d/#yyyy #h:#m #a")) --> 8/2/2022 9:33 PM
 ```
 
-Add notes about how to use the system.
+More features are planned to come!
