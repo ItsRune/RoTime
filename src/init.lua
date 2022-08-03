@@ -1,23 +1,22 @@
-local time = {}
-local mt = {}
-
-mt.__index = mt
-
 local function Constructor()
-    local self = setmetatable({}, mt)
-    
+    local time = {}
+    local mt = {}
+
+    mt.__index = mt
+
     for _,v in next, script.modules:GetChildren() do
         if v:IsA("ModuleScript") then
-            self[v.Name] = require(v)
+            mt[v.Name] = require(v)
         end
     end
 
-    self._now = os.time()
-    self._nowtick = tick()
+    time._now = os.time()
+    time._nowdt = DateTime.now()
 
-    return self
+    return setmetatable(time, mt)
 end
 
-time.new = Constructor
+local x = {}
+x.new = Constructor
 
-return time
+return x
