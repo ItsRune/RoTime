@@ -1,4 +1,4 @@
-# Project Title
+# RoTime
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@ RoTime is a roblox module for manipulating, parsing, timezoning, and validating 
 
 ## Getting Started <a name = "getting_started"></a>
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. Installation is pretty simple, just get the [module](https://www.roblox.com/library/10459870631/RoTime) and place it into `ReplicatedStorage` then you're basically finished.
 
 ## Usage <a name = "usage"></a>
 
