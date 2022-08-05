@@ -1,11 +1,5 @@
 # RoTime
 
-<style>
-.beta-tag: {
-    text: "dd";
-}
-</style>
-
 ## Table of Contents
 
 - [About](#about)
@@ -54,7 +48,8 @@ print(oneMinuteBehind:format("#h:#m")) --> 1:35
 
 ##### Creating Timers
 ```lua
-local myTimer = RoTime.new():createTimer(1, "minute", 1)
+-- (howLong : number, type : string, step, startAt)
+local myTimer = RoTime.new():createTimer(1, "minute", 1, 0)
 ```
 
 ##### Functions
@@ -67,6 +62,7 @@ myTimer:Cancel() -- Cancels the timer entirely.
 
 ##### Connections
 ```lua
+-- elapsedTime will always be how many seconds since start.
 myTimer.OnUpdate:Connect(function(elapsedTime)
     print("myTimer's elapsed time: " .. elapsedTime)
 end)

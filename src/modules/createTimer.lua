@@ -6,13 +6,12 @@ local fromType = {
     ["second"] = 1;
 }
 
-return function(self : table, amount : number, type : string, step) : table
+return function(self : table, amount : number, type : string, step, startAt) : table
     local timer = {}
     local mt = {}
     mt.__index = mt
 
     assert(typeof(amount) == "number", debug.traceback("Expected number, got " .. typeof(amount), 2))
-    assert(typeof(step) == "number", debug.traceback("Expected number, got " .. typeof(step), 2))
     assert(fromType[type] ~= nil, debug.traceback("Expected one of the following types: hour, minute, second", 2))
 
     local toWaitFor = amount * fromType[type]
@@ -25,8 +24,8 @@ return function(self : table, amount : number, type : string, step) : table
     
     timer._id = math.random(1, 1000000)
     timer._startTime = 0
-    timer._now = 0
     timer._lastUpdate = os.time()
+    timer._now = (tonumber(startAt) == nil) and 0 or (tonumber(startAt) <= 0) and 0 or tonumber(startAt)
     timer._step = (tonumber(step) == nil) and 1 or (tonumber(step) <= 0) and 1 or tonumber(step)
     
     timer._started = false
