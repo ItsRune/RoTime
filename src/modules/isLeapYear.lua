@@ -1,7 +1,10 @@
-return function(self)
+return function(self, year)
     local unix = self:unix()
-    local now = os.date("*t", unix)
-    local year = now.year
+    
+    if not tonumber(year) then
+        local now = os.date("*t", unix)
+        year = now.year
+    end
 
     return (
         (year % 4 == 0 and year % 100 ~= 0) or
