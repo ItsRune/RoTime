@@ -1,50 +1,7 @@
-local formattingCodes = {
-    ["h"] = "hour_12";
-    ["hh"] = "hour_24";
-    ["s"] = "sec";
-    ["m"] = "min";
-    ["y"] = "year";
-    ["yy"] = "year";
-    ["yyy"] = "year";
-    ["yyyy"] = "year";
-    ["YY"] = "year";
-    ["YYY"] = "year";
-    ["YYYY"] = "year";
-    ["d"] = "day_num";
-    ["w"] = "week";
-    ["mm"] = "month_num";
-    ["MM"] = "month_short";
-    ["MMM"] = "month_long";
-    ["DD"] = "day_short";
-    ["DDD"] = "day_long";
-    ["a"] = "ampm";
-}
-
-local days = {
-    [7] = {"Sunday", "Sun"};
-    [1] = {"Monday", "Mon"};
-    [2] = {"Tuesday", "Tue"};
-    [3] = {"Wednesday", "Wed"};
-    [4] = {"Thursday", "Thu"};
-    [5] = {"Friday", "Fri"};
-    [6] = {"Saturday", "Sat"};
-}
-
-local months = {
-    [1] = {"January", "Jan"};
-    [2] = {"February", "Feb"};
-    [3] = {"March", "Mar"};
-    [4] = {"April", "Apr"};
-    [5] = {"May", "May"};
-    [6] = {"June", "Jun"};
-    [7] = {"July", "Jul"};
-    [8] = {"August", "Aug"};
-    [9] = {"September", "Sep"};
-    [10] = {"October", "Oct"};
-    [11] = {"November", "Nov"};
-    [12] = {"December", "Dec"};
-}
-
+local patterns = require(script.Parent.patterns)
+local formattingCodes = patterns.formattingCodes
+local days = patterns.days
+local months = patterns.months
 
 local function addAppropriateOutput(codeType, nowTime)
     local split = codeType:split("_")
@@ -100,43 +57,8 @@ local function addAppropriateOutput(codeType, nowTime)
     return "Unknown"
 end
 
-local function parseData(date)
-    local lengthOfStr = #tostring(date)
-    local triggered = false
-    local context = ""
-    local codesAndIndices = {}
-
-    for i = 1, lengthOfStr + 1 do
-        local char = tostring(date):sub(i, i)
-        
-        if triggered then
-            if formattingCodes[context] and tostring(char) ~= string.sub(context, 1, 1) then
-                table.insert(codesAndIndices, {
-                    ["code"] = formattingCodes[context];
-                    ["startindex"] = i - #context - 1;
-                    ["endindex"] = i - 1;
-                })
-                context = ""
-                triggered = false
-                continue
-            end
-
-            if char == nil then break end
-            context = context .. char
-        elseif char == "#" then
-            if triggered then
-                context = context .. char
-            else
-                triggered = true
-            end
-        end
-    end
-
-    return codesAndIndices
-end
-
 return function(self, code)
-    local codeData = parseData(code)
+    local codeData = self._parser(code)
     local newCode = ""
     local alreadyDone = {}
     local nowDate = os.date("!*t", self._now)
