@@ -1,4 +1,5 @@
-return function(self, type)
+local Types = require(script.Parent.Parent.typeChecks)
+return function(self: Types.RoTime, type: Types.getFunctionTypes): number
     local date = os.date("!*t", self._now)
 
     local typeConversion = {

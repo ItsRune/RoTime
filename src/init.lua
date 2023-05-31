@@ -1,6 +1,7 @@
 -- Documentation on how to use:
 -- https://github.com/ItsRune/RoTime/blob/master/README.md
-local function Constructor()
+local Types = require(script.typeChecks)
+local function Constructor(): Types.RoTime
     local time = {}
     local mt = {}
 

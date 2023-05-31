@@ -2,8 +2,9 @@ local patterns = require(script.Parent.patterns)
 local formattingCodes = patterns.formattingCodes
 local days = patterns.days
 local months = patterns.months
+local Types = require(script.Parent.Parent.typeChecks)
 
-local function addAppropriateOutput(codeType, nowTime)
+local function addAppropriateOutput(codeType: string, nowTime: string | {any}): string
     local split = codeType:split("_")
     local name = split[1]
     local type = split[2]
@@ -57,7 +58,7 @@ local function addAppropriateOutput(codeType, nowTime)
     return "Unknown"
 end
 
-return function(self, code)
+return function(self: Types.RoTime, code: string): string
     local codeData = self._parser(code)
     local newCode = ""
     local alreadyDone = {}

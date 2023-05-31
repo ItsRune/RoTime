@@ -1,3 +1,4 @@
+local Types = require(script.Parent.Parent.typeChecks)
 local Zones = {
     ["America/Philidolphia"] = 0;
     ["America/CDT"] = 0;
@@ -30,7 +31,7 @@ local Zones = {
     ["Africa/Eastern"] = 3;
 }
 
-return function(self, zone)
+return function(self: Types.RoTime, zone: Types.Zones): Types.RoTime
     local zoneTime = Zones[zone]
     if not zoneTime then
         return error(debug.traceback("Invalid zone was provided. Please double check your spelling & capitalization!", 2))

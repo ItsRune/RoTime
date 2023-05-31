@@ -1,4 +1,6 @@
-return function(self, amount, type)
+local Types = require(script.Parent.Parent.typeChecks)
+
+return function(self: Types.RoTime, amount: number, type: Types.getFunctionTypes): Types.RoTime
     local toMult = 0
 
     if type == "second" then
