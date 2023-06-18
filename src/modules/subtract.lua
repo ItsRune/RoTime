@@ -20,7 +20,7 @@ return function(self: Types.RoTime, amount: number, type: Types.getFunctionTypes
     end
 
     self._now = self._now - (amount * toMult)
-    self._nowdt = self._nowdt - ((amount * toMult) * 1000)
+    self._nowdt = DateTime.fromUnixTimestamp(self._now)
 
     return self
 end
