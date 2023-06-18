@@ -15,7 +15,7 @@ export type RoTime = {
     unix: (self: RoTime) -> number,
     utc: (self: RoTime) -> number,
 
-    -- set: (self: RoTime, type: string, value: number) -> RoTime,
+    -- set: (self: RoTime, toSetTo: string, format: string?) -> RoTime,
 }
 
 export type Timer = {
