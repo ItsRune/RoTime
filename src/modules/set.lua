@@ -1,9 +1,13 @@
-return function(self, toSetTo : nil, type : nil)
-    return self, "Broken"
-    -- assert(typeof(toSetTo) == "number", debug.traceback("Expected number, got " .. typeof(toSetTo), 2))
-    -- local date = os.date("!*t", self._now)
+local patterns = require(script.Parent.patterns)
+local formattingCodes = patterns.formattingCodes
 
-    -- warn(self)
+return function(self, newDate, format)
+    -- Sets the self._now variable to a new date
+    -- @param newDate: string
+    -- @param format: string
+    -- @returns self
 
-    -- return self
+    local codeData = self._parser(format)
+    
+    warn(codeData)
 end

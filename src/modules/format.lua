@@ -1,5 +1,4 @@
 local patterns = require(script.Parent.patterns)
-local formattingCodes = patterns.formattingCodes
 local days = patterns.days
 local months = patterns.months
 
@@ -66,26 +65,27 @@ return function(self, code)
     for i = 1, #tostring(code) do
         local didSomething = false
         for index,_ in next, codeData do
-            if (i >= codeData[index].startindex and i <= codeData[index].endindex) and alreadyDone[codeData[index].endindex] == true then
+            local data = codeData[index]
+            if (i >= data.startindex and i <= data.endindex) and alreadyDone[data.endindex] == true then
                 didSomething = true
                 continue
             end
 
-            if codeData[index].startindex == i then
-                local dating = addAppropriateOutput(codeData[index].code, nowDate)
+            if data.startindex == i then
+                local dating = addAppropriateOutput(data.code, nowDate)
                 if dating == "Unknown" then
                     break
                 end
 
                 newCode = newCode .. dating
-                alreadyDone[codeData[index].endindex] = true
+                alreadyDone[data.endindex] = true
                 didSomething = true
                 break
             end
         end
 
         if not didSomething then
-            newCode = newCode .. tostring(code):sub(i, i)
+            newCode = `{newCode}{tostring(code):sub(i, i)}`
         end
     end
 

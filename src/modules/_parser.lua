@@ -23,10 +23,10 @@ local function parseData(date)
             end
 
             if char == nil then break end
-            context = context .. char
+            context = `{context}{char}`
         elseif char == "#" then
             if triggered then
-                context = context .. char
+                context = `{context}{char}`
             else
                 triggered = true
             end

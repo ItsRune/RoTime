@@ -17,8 +17,8 @@ return function(self, amount, type)
         toMult = 31536000
     end
 
-    self._now = self._now + (amount * toMult)
-    self._nowdt = self._nowdt + ((amount * toMult) * 1000)
+    self._now += (amount * toMult)
+    self._nowdt = DateTime.fromUnixTimestamp(self._now)
 
     return self
 end

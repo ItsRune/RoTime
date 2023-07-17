@@ -8,7 +8,19 @@ local function Constructor()
 
     for _,v in next, script.modules:GetChildren() do
         if v:IsA("ModuleScript") then
-            mt[v.Name] = require(v)
+            local data = require(v)
+
+            if typeof(data) == "function" then
+                mt[v.Name] = data
+                continue
+            end
+
+            if (typeof(data) == "table" and data["alias"] ~= nil) then
+                for _,alias in next, data["alias"] do
+                    mt[alias] = data["func"]
+                end
+                continue
+            end
         end
     end
 
