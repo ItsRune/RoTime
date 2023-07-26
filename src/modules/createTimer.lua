@@ -41,8 +41,7 @@ return function(self: Types.RoTime, amount: number, type: string, step: number?,
 	end
 	table.insert(cachedIds, timerMod._id)
 
-	function mt.Start(this: Types.Timer): nil
-		warn(timerMod._class)
+	function mt:Start(): nil
 		if timerMod._started or (timerMod["_class"] == nil or timerMod["_class"] ~= "Timer") then
 			return
 		end
@@ -51,21 +50,21 @@ return function(self: Types.RoTime, amount: number, type: string, step: number?,
 		timerMod._startTime = os.time()
 	end
 
-	function mt.Pause(this: Types.Timer): nil
+	function mt:Pause(): nil
 		if not timerMod._started then
 			return
 		end
 		timerMod._paused = true
 	end
 
-	function mt.Resume(this: Types.Timer): nil
+	function mt:Resume(): nil
 		if not timerMod._paused then
 			return
 		end
 		timerMod._paused = false
 	end
 
-	function mt.Cancel(this: Types.Timer): nil
+	function mt:Cancel(): nil
 		if not timerMod._started or (timerMod["_class"] == nil or timerMod["_class"] ~= "Timer") then
 			return
 		end

@@ -1,0 +1,10 @@
+gitRepoUrl = "https://github.com/ItsRune/RoTime"
+gitSourceBranch = "master"
+
+[[classOrder]]
+section = "RoTime"
+classes = ["RoTime"]
+
+[footer]
+style = "dark"
+copyright = "Copyright © 2023 ItsRune. Built with Moonwave and Docusaurus"

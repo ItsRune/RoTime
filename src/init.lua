@@ -2,34 +2,35 @@
 -- https://github.com/ItsRune/RoTime/blob/master/README.md
 local Types = require(script.typeChecks)
 local function Constructor(): Types.RoTime
-    local time = {}
-    local mt = {}
+	local time = {}
+	local mt = {}
 
-    mt.__index = mt
+	mt.__index = mt
 
-    for _,v in next, script.modules:GetChildren() do
-        if v:IsA("ModuleScript") then
-            local data = require(v)
+	for _, v in next, script.modules:GetChildren() do
+		if v:IsA("ModuleScript") then
+			local data = require(v)
 
-            if typeof(data) == "function" then
-                mt[v.Name] = data
-                continue
-            end
+			if typeof(data) == "function" then
+				mt[v.Name] = data
+				continue
+			end
 
-            if (typeof(data) == "table" and data["alias"] ~= nil) then
-                for _,alias in next, data["alias"] do
-                    mt[alias] = data["func"]
-                end
-                continue
-            end
-        end
-    end
+			if typeof(data) == "table" and data["alias"] ~= nil then
+				for _, alias in next, data["alias"] do
+					mt[alias] = data["func"]
+				end
+				continue
+			end
+		end
+	end
 
-    time._now = os.time()
-    time._nowdt = DateTime.now()
-    time._timezone = "UTC"
+	time._now = os.time()
+	time._nowdt = DateTime.now()
+	time._timezone = "UTC"
+	time._globalFormat = "#dd/#mm/#yyyy #h:#m:#s #a"
 
-    return setmetatable(time, mt)
+	return setmetatable(time, mt)
 end
 
 local x = {}
