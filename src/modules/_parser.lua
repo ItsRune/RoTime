@@ -1,7 +1,7 @@
 local patterns = require(script.Parent.patterns)
 local formattingCodes = patterns.formattingCodes
 
-local function parseData(date)
+local function parseData(date: string)
     local lengthOfStr = #tostring(date)
     local triggered = false
     local context = ""

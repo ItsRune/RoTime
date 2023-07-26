@@ -1,4 +1,5 @@
-return function(self, year)
+local Types = require(script.Parent.Parent.typeChecks)
+return function(self: Types.RoTime, year: number?): boolean
     local unix = self:unix()
     
     if not tonumber(year) then

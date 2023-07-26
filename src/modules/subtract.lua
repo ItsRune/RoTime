@@ -1,4 +1,6 @@
-return function(self, amount, type)
+local Types = require(script.Parent.Parent.typeChecks)
+
+return function(self: Types.RoTime, amount: number, type: Types.getFunctionTypes): Types.RoTime
     local toMult = 0
 
     if type == "second" then
@@ -16,11 +18,8 @@ return function(self, amount, type)
     elseif type == "year" then
         toMult = 31536000
     end
-
-    local multiAmount = (amount * toMult)
-    warn(multiAmount)
     
-    self._now -= multiAmount
+    self._now -= (amount * toMult)
     self._nowdt = DateTime.fromUnixTimestamp(self._now)
 
     return self

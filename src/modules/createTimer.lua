@@ -1,4 +1,5 @@
 local RunService = game:GetService("RunService")
+local Types = require(script.Parent.Parent.typeChecks)
 local cachedIds = {}
 local fromType = {
     ["hour"] = 3600;
@@ -6,7 +7,7 @@ local fromType = {
     ["second"] = 1;
 }
 
-return function(self : table, amount : number, type : string, step, startAt) : table
+return function(self: Types.RoTime, amount: number, type: string, step: number?, startAt: number?) : Types.Timer
     local timer = {}
     local mt = {}
     mt.__index = mt
@@ -40,7 +41,7 @@ return function(self : table, amount : number, type : string, step, startAt) : t
     end
     table.insert(cachedIds, timerMod._id)
 
-    function mt.Start(this : table) : nil
+    function mt.Start(this: Types.Timer) : nil
         warn(timerMod._class)
         if timerMod._started or (timerMod["_class"] == nil or timerMod["_class"] ~= "Timer") then return end
         
@@ -48,17 +49,17 @@ return function(self : table, amount : number, type : string, step, startAt) : t
         timerMod._startTime = os.time()
     end
 
-    function mt.Pause(this : table) : nil
+    function mt.Pause(this: Types.Timer) : nil
         if not timerMod._started then return end
         timerMod._paused = true
     end
 
-    function mt.Resume(this : table) : nil
+    function mt.Resume(this: Types.Timer) : nil
         if not timerMod._paused then return end
         timerMod._paused = false
     end
 
-    function mt.Cancel(this : table) : nil
+    function mt.Cancel(this: Types.Timer) : nil
         if not timerMod._started or (timerMod["_class"] == nil or timerMod["_class"] ~= "Timer") then return end
         RunService:UnbindFromRenderStep(timerMod._id)
         timerMod._class = "CancelledTimer"
