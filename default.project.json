@@ -12,10 +12,8 @@
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Client": {
-          "$path": "src/tests",
-          "$properties": {
-            "Enabled": false
-          }
+          "$className": "Folder",
+          "$path": "src/tests"
         }
       }
     },
