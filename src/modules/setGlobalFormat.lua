@@ -6,6 +6,7 @@ local Types = require(script.Parent.Parent.typeChecks)
 	@method setGlobalFormat
 	@within RoTime
 	@tag Chainable
+	@tag Optional
 
 	@param newGlobalFormat string
 	

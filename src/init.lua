@@ -12,9 +12,13 @@ local Types = require(script.typeChecks)
 
 	@within Constructor
 	@function new
+
+
+		
+
 	@return RoTime
 ]=]
-local function Constructor(): Types.RoTime
+local function Constructor(toStartAt: string, format: string): Types.RoTime
 	local time = {}
 	local mt = {}
 
@@ -36,9 +40,9 @@ local function Constructor(): Types.RoTime
 				continue
 			end
 
-			if typeof(data) == "table" and data["alias"] == nil then
+			if typeof(data) == "table" and #data > 0 then
 				for _, b in next, data do
-					mt[b.alias] = b.func
+					mt[b.name] = b.func
 				end
 			end
 		end

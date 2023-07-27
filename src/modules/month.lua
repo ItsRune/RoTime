@@ -15,10 +15,6 @@ return {
 		local currentMonth = os.date("*t", self._now).month
 		local difference = math.abs(currentMonth - newMonth)
 
-		if currentMonth < newMonth then
-			return self:add(difference, "month")
-		else
-			return self:subtract(difference, "month")
-		end
+		return (currentMonth < newMonth) and self:add(difference, "month") or self:subtract(difference, "month")
 	end,
 }

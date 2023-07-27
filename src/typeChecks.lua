@@ -32,18 +32,21 @@ export type RoTime = {
 	_nowdt: DateTime,
 
 	add: (self: RoTime, time: number, unit: string) -> RoTime,
-	subtract: (self: RoTime, time: number, unit: string) -> RoTime,
 	addTimezone: (self: RoTime, zoneName: string, zoneOffset: number) -> RoTime,
-	removeTimezone: (self: RoTime, zoneName: string) -> RoTime,
-	timezone: (self: RoTime, timezone: Zones) -> RoTime,
 	createTimer: (self: RoTime, amount: number, type: string, step: number?, startAt: number?) -> Timer,
+	removeTimezone: (self: RoTime, zoneName: string) -> RoTime,
+	setGlobalFormat: (self: RoTime, format: string) -> RoTime,
+	subtract: (self: RoTime, time: number, unit: string) -> RoTime,
+	set: (self: RoTime, toSetTo: string, ignoreWarnings: boolean?) -> RoTime,
+	timezone: (self: RoTime, timezone: Zones) -> RoTime,
 
 	format: (self: RoTime, formattingString: string) -> string,
+	getDate: (self: RoTime) -> string,
+	getTime: (self: RoTime) -> string,
 	get: (self: RoTime, type: string) -> number,
 	isLeapYear: (self: RoTime) -> boolean,
 	Unix: (self: RoTime) -> number,
 	UnixMillis: (self: RoTime) -> number,
-	-- set: (self: RoTime, toSetTo: string, format: string?) -> RoTime,
 }
 
 export type Timer = {

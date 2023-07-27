@@ -35,7 +35,7 @@ local Zones = {
 }
 
 --[=[
-	Sets the current date to a specific timezone.
+	Sets the current class's timezone to the one specified.
 
 	@within RoTime
 	@tag Chainable
@@ -48,6 +48,10 @@ local Zones = {
 
 --[=[
 	Adds a new timezone defined by the developer.
+
+	```lua
+	RoTime:addTimezone("Texas", -6)
+	```
 
 	@within RoTime
 	@tag Chainable
@@ -69,6 +73,15 @@ local Zones = {
 	@param zoneName string
 
 	@return RoTime
+]=]
+
+--[=[
+	Gets the current timezone's name.
+
+	@within RoTime
+	@method getTimezone
+
+	@return string
 ]=]
 return {
 	{
@@ -106,6 +119,13 @@ return {
 			assert(Zones[zoneName], "Zone already doesn't exist!")
 			Zones[zoneName] = nil
 			return self
+		end,
+	},
+
+	{
+		name = "getTimezone",
+		func = function(self: Types.RoTime): string
+			return self._timezone
 		end,
 	},
 }

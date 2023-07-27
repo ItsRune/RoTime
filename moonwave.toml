@@ -1,7 +1,7 @@
 gitRepoUrl = "https://github.com/ItsRune/RoTime"
 baseUrl = "/"
 
-classOrder = ["RoTime"]
+classOrder = ["Constructor", "RoTime"]
 
 [footer]
 style = "dark"

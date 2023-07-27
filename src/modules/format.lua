@@ -25,33 +25,19 @@ local function addAppropriateOutput(codeType: string, nowTime: string | { any })
 			return months[nowTime.month][1]
 		end
 	elseif name == "hour" then
-		if type == "12" then
-			return tostring((nowTime.hour % 12) == 0 and 12 or nowTime.hour % 12)
-		elseif type == "24" then
-			return tostring(nowTime.hour)
-		end
+		return (type == "12") and tostring((nowTime.hour % 12) == 0 and 12 or nowTime.hour % 12)
+			or (nowTime.hour > 9) and tostring(nowTime.hour)
+			or "0" .. tostring(nowTime.hour)
 	elseif name == "week" then
 		return tostring(nowTime.wday)
 	elseif name == "min" then
-		if nowTime.min > 9 then
-			return tostring(nowTime.min)
-		else
-			return "0" .. tostring(nowTime.min)
-		end
+		return (nowTime.min > 9) and tostring(nowTime.min) or "0" .. tostring(nowTime.min)
 	elseif name == "sec" then
-		if nowTime.sec > 9 then
-			return tostring(nowTime.sec)
-		else
-			return "0" .. tostring(nowTime.sec)
-		end
+		return (nowTime.sec > 9) and tostring(nowTime.sec) or "0" .. tostring(nowTime.sec)
 	elseif name == "year" then
 		return tostring(nowTime.year)
 	elseif name == "ampm" then
-		if nowTime.hour < 12 then
-			return "AM"
-		else
-			return "PM"
-		end
+		return (nowTime.hour < 12) and "AM" or "PM"
 	end
 
 	return "Unknown"
@@ -61,8 +47,8 @@ end
 	Formats a string of code into a string of time.
 
 	```lua
-	local Proto = require(script.Parent).new()
-	local time = Proto:format("#h:#m:#s")
+	RoTime:format("#h:#m:#s")
+	RoTime:format() -- Uses the global format
 	```
 
 	You can find the formatting patterns [here](/RoTime/docs/Patterns).
@@ -70,11 +56,12 @@ end
 	@method format
 	@within RoTime
 
-	@param code string
+	@param code string | nil
 
 	@return string
 ]=]
-return function(self: Types.RoTime, code: string): string
+return function(self: Types.RoTime, code: string?): string
+	code = code or self._globalFormat
 	local codeData = self._parser(code)
 	local newCode = ""
 	local alreadyDone = {}
@@ -84,19 +71,19 @@ return function(self: Types.RoTime, code: string): string
 		local didSomething = false
 		for index, _ in next, codeData do
 			local data = codeData[index]
-			if (i >= data.startindex and i <= data.endindex) and alreadyDone[data.endindex] == true then
+			if (i >= data.startIndex and i <= data.endIndex) and alreadyDone[data.endIndex] == true then
 				didSomething = true
 				continue
 			end
 
-			if data.startindex == i then
+			if data.startIndex == i then
 				local dating = addAppropriateOutput(data.code, nowDate)
 				if dating == "Unknown" then
 					break
 				end
 
 				newCode = newCode .. dating
-				alreadyDone[data.endindex] = true
+				alreadyDone[data.endIndex] = true
 				didSomething = true
 				break
 			end

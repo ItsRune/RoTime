@@ -13,6 +13,9 @@ local Types = require(script.Parent.Parent.typeChecks)
 	@param date string
 
 	@return RoTime
+	:::info
+	This method is currently unavailable and usage will result in defaulting back to the `RoTime` class.
+	:::
 ]=]
 return function(self: Types.RoTime, toFormatFrom: string): Types.RoTime
 	return self

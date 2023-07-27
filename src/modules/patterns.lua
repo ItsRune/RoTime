@@ -49,4 +49,5 @@ return {
 	formattingCodes = formattingCodes,
 	days = days,
 	months = months,
+	triggerChar = "#", -- The character that triggers a formatting code
 }

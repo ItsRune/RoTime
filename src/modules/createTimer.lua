@@ -2,6 +2,9 @@ local RunService = game:GetService("RunService")
 local Types = require(script.Parent.Parent.typeChecks)
 local cachedIds = {}
 local fromType = {
+	["year"] = 31536000,
+	["month"] = 2592000,
+	["day"] = 86400,
 	["hour"] = 3600,
 	["minute"] = 60,
 	["second"] = 1,
@@ -23,27 +26,54 @@ local fromType = {
 ]=]
 
 --[=[
-	Creates a timer from "startAt" to "amount" with a given "type".
+	Creates a timer that can be used to track the amount of time until a certain time.
+
+	```lua
+	-- This timer will update every 5 seconds, will start at 1 minute and last for 1 hour.
+	local myTimer = RoTime:createTimer(1, "hour", 5, 60)
+
+	myTimer.OnUpdate:Connect(function(elapsedTime: number)
+		print("Timer updated! Elapsed time: " .. elapsedTime)
+	end)
+
+	myTimer.OnCompletion:Connect(function()
+		print("Timer completed!")
+	end)
+
+	myTimer:Start()
+	```
 
 	@within RoTime
 	@method createTimer
 
-	@param amount number
-	@param type string
-	@param step number
-	@param startAt number
+	@param waitForAmount number
+	@param incrementType string
+	@param step number | nil
+	@param startAt number | nil
 	
 	@return Timer
+	:::danger
+	At this moment, [**Signal**](https://sleitnick.github.io/RbxUtil/api/Signal/) is not being used! Please remember to disconnect any connections you make!
+	:::
 ]=]
-return function(self: Types.RoTime, amount: number, type: string, step: number?, startAt: number?): Types.Timer
+return function(
+	self: Types.RoTime,
+	waitForAmount: number,
+	incrementType: string,
+	step: number?,
+	startAt: number?
+): Types.Timer
 	local timer = {}
 	local mt = {}
 	mt.__index = mt
 
-	assert(typeof(amount) == "number", debug.traceback("Expected number, got " .. typeof(amount), 2))
-	assert(fromType[type] ~= nil, debug.traceback("Expected one of the following types: hour, minute, second", 2))
+	assert(typeof(waitForAmount) == "number", debug.traceback("Expected number, got " .. typeof(waitForAmount), 2))
+	assert(
+		fromType[incrementType] ~= nil,
+		debug.traceback("Expected one of the following types: hour, minute, second", 2)
+	)
 
-	local toWaitFor = amount * fromType[type]
+	local toWaitFor = waitForAmount * fromType[incrementType]
 
 	timer._updateEvent = Instance.new("BindableEvent")
 	timer._completeEvent = Instance.new("BindableEvent")

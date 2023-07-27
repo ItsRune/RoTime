@@ -17,10 +17,6 @@ return {
 		local currentDay = os.date("*t", self._now).day
 		local difference = math.abs(currentDay - newDay)
 
-		if currentDay < newDay then
-			return self:add(difference, "day")
-		else
-			return self:subtract(difference, "day")
-		end
+		return (currentDay < newDay) and self:add(difference, "day") or self:subtract(difference, "day")
 	end,
 }
