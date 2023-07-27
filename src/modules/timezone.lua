@@ -29,21 +29,83 @@ local Zones = {
 	["Africa/Western"] = 1,
 	["Africa/Central"] = 2,
 	["Africa/Eastern"] = 3,
+
+	["UTC"] = 0,
+	["GMT"] = 0,
 }
 
-return function(self: Types.RoTime, zone: Types.Zones): Types.RoTime
-	local zoneTime = Zones[zone]
-	if not zoneTime then
-		return error(
-			debug.traceback("Invalid zone was provided. Please double check your spelling & capitalization!", 2)
-		)
-	end
+--[=[
+	Sets the current date to a specific timezone.
 
-	local nowGMT = DateTime.now().UnixTimestamp
-	--/ Utc and Gmt are the same.
-	self._now = nowGMT + math.floor(60 * 60 * zoneTime)
-	self._nowdt = DateTime.fromUnixTimestamp(self._now)
-	self._timezone = zone
+	@within RoTime
+	@tag Chainable
+	@method timezone
 
-	return self
-end
+	@param zone string
+	
+	@return RoTime
+]=]
+
+--[=[
+	Adds a new timezone defined by the developer.
+
+	@within RoTime
+	@tag Chainable
+	@method addTimezone
+
+	@param zoneName string
+	@param zoneOffset number
+
+	@return RoTime
+]=]
+
+--[=[
+	Removes a timezone.
+
+	@within RoTime
+	@tag Chainable
+	@method removeTimezone
+
+	@param zoneName string
+
+	@return RoTime
+]=]
+return {
+	{
+		name = "timezone",
+		func = function(self: Types.RoTime, zone: Types.Zones): Types.RoTime
+			local zoneTime = Zones[zone]
+			if not zoneTime then
+				return error(
+					debug.traceback("Invalid zone was provided. Please double check your spelling & capitalization!", 2)
+				)
+			end
+
+			local nowGMT = DateTime.now().UnixTimestamp
+
+			self._now = nowGMT + math.floor(60 * 60 * zoneTime)
+			self._nowdt = DateTime.fromUnixTimestamp(self._now)
+			self._timezone = zone
+
+			return self
+		end,
+	},
+
+	{
+		name = "addTimezone",
+		func = function(self: Types.RoTime, zoneName: string, zoneOffset: number): Types.RoTime
+			assert(Zones[zoneName] == nil, "Zone already exists!")
+			Zones[zoneName] = zoneOffset
+			return self
+		end,
+	},
+
+	{
+		name = "removeTimezone",
+		func = function(self: Types.RoTime, zoneName: string): Types.RoTime
+			assert(Zones[zoneName], "Zone already doesn't exist!")
+			Zones[zoneName] = nil
+			return self
+		end,
+	},
+}

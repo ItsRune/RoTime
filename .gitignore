@@ -3,6 +3,7 @@
 
 /aftman.toml
 /src/tests
+/build
 
 # Roblox Studio lock files
 /*.rbxlx.lock

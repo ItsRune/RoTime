@@ -1,4 +1,15 @@
 local Types = require(script.Parent.Parent.typeChecks)
+
+--[=[
+	Gets a specific value from the current time's date.
+
+	@method get
+	@within RoTime
+
+	@param type string
+
+	@return number
+]=]
 return function(self: Types.RoTime, type: Types.getFunctionTypes): number
 	local date = os.date("!*t", self._now)
 

@@ -7,6 +7,34 @@ local fromType = {
 	["second"] = 1,
 }
 
+-- selene: allow(unused_variable)
+-- selene: allow(shadowing)
+
+--[=[
+	@within RoTime
+	@interface Timer
+	.OnUpdate RBXScriptSignal
+	.OnCompletion RBXScriptSignal
+
+	.Start (self: Timer) -> nil
+	.Pause (self: Timer) -> nil
+	.Resume (self: Timer) -> nil
+	.Cancel (self: Timer) -> nil
+]=]
+
+--[=[
+	Creates a timer from "startAt" to "amount" with a given "type".
+
+	@within RoTime
+	@method createTimer
+
+	@param amount number
+	@param type string
+	@param step number
+	@param startAt number
+	
+	@return Timer
+]=]
 return function(self: Types.RoTime, amount: number, type: string, step: number?, startAt: number?): Types.Timer
 	local timer = {}
 	local mt = {}

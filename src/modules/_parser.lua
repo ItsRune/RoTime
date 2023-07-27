@@ -1,7 +1,23 @@
 local patterns = require(script.Parent.patterns)
 local formattingCodes = patterns.formattingCodes
 
-local function parseData(date: string)
+--[=[
+	@within RoTime
+	@private
+	@interface Parsed
+	.code string
+	.startindex number
+	.endindex number
+]=]
+
+--[=[
+	@within RoTime
+	@method _parser
+
+	@return Parsed
+	@private
+]=]
+local function parseData(date: string): { code: string, startindex: number, endindex: number }
 	local lengthOfStr = #tostring(date)
 	local triggered = false
 	local context = ""

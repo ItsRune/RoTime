@@ -1,4 +1,15 @@
 local Types = require(script.Parent.Parent.typeChecks)
+
+--[=[
+	Checks if a year is a leap year.
+
+	@within RoTime
+	@method isLeapYear
+
+	@param year number | nil
+
+	@return boolean
+]=]
 return function(self: Types.RoTime, year: number?): boolean
 	local unix = self:unix()
 

@@ -1,4 +1,17 @@
 local Types = require(script.Parent.Parent.typeChecks)
+
+--[=[
+	Adds a certain amount of time to the current time.
+
+	@within RoTime
+	@method add
+	@tag Chainable
+	
+	@param amount number
+	@param type string
+
+	@return RoTime
+]=]
 return function(self: Types.RoTime, amount: number, type: Types.getFunctionTypes): Types.RoTime
 	local toMult = 0
 

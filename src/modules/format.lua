@@ -57,6 +57,23 @@ local function addAppropriateOutput(codeType: string, nowTime: string | { any })
 	return "Unknown"
 end
 
+--[=[
+	Formats a string of code into a string of time.
+
+	```lua
+	local Proto = require(script.Parent).new()
+	local time = Proto:format("#h:#m:#s")
+	```
+
+	You can find the formatting patterns [here](/RoTime/docs/Patterns).
+
+	@method format
+	@within RoTime
+
+	@param code string
+
+	@return string
+]=]
 return function(self: Types.RoTime, code: string): string
 	local codeData = self._parser(code)
 	local newCode = ""
