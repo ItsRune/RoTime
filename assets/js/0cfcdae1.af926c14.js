@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[782],{3891:s=>{s.exports=JSON.parse('{"sourceUrl":"https://github.com/ItsRune/RoTime/blob/master","baseUrl":"/RoTime/","classOrder":[],"apiCategories":[]}')}}]);
