@@ -27,19 +27,30 @@ export type Zones =
 	| "UTC"
 
 export type getFunctionTypes = "second" | "minute" | "hour" | "day" | "week" | "month" | "year"
+export type calenderData = {
+	weekCount: number,
+	totalDays: number,
+	calender: { [number]: string },
+}
+
 export type RoTime = {
+	-- Private Properties
 	_now: number,
 	_nowdt: DateTime,
+	_globalFormat: string,
+	_timezone: string,
 
+	-- Setters
 	add: (self: RoTime, time: number, unit: string) -> RoTime,
 	addTimezone: (self: RoTime, zoneName: string, zoneOffset: number) -> RoTime,
 	createTimer: (self: RoTime, amount: number, type: string, step: number?, startAt: number?) -> Timer,
 	removeTimezone: (self: RoTime, zoneName: string) -> RoTime,
 	setGlobalFormat: (self: RoTime, format: string) -> RoTime,
+	setTimezone: (self: RoTime, timezone: Zones) -> RoTime,
 	subtract: (self: RoTime, time: number, unit: string) -> RoTime,
-	set: (self: RoTime, toSetTo: string, ignoreWarnings: boolean?) -> RoTime,
-	timezone: (self: RoTime, timezone: Zones) -> RoTime,
+	set: (self: RoTime, toSetTo: string, formatToUse: string?, ignoreWarnings: boolean?) -> RoTime,
 
+	-- Getters
 	format: (self: RoTime, formattingString: string) -> string,
 	getDate: (self: RoTime) -> string,
 	getTime: (self: RoTime) -> string,
@@ -47,6 +58,10 @@ export type RoTime = {
 	isLeapYear: (self: RoTime) -> boolean,
 	Unix: (self: RoTime) -> number,
 	UnixMillis: (self: RoTime) -> number,
+
+	-- Disabled
+	getCalender: (self: RoTime) -> {},
+	fromNow: (self: RoTime, destinationDate: string, formatToUse: string?) -> RoTime,
 }
 
 export type Timer = {

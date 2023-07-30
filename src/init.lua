@@ -13,12 +13,16 @@ local Types = require(script.typeChecks)
 	@within Constructor
 	@function new
 
-
-		
+	@param toStartAt string | nil
+	@param format string | nil
 
 	@return RoTime
+	:::info
+	`toStartAt` and `format` are as of this version, not usable.
+	:::
 ]=]
-local function Constructor(toStartAt: string, format: string): Types.RoTime
+
+local function Constructor(): Types.RoTime
 	local time = {}
 	local mt = {}
 

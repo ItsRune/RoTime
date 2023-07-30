@@ -7,6 +7,13 @@ local RoTime = require(script.Parent).new()
 RoTime:addTimezone("United Kingdom", 0)
 ```
 
+## Setting
+If you'd like to set the timezone, you can do so by using the `setTimezone` method. For example, if you wanted to set the timezone to the United Kingdom, you would do the following:
+```lua
+local RoTime = require(script.Parent).new()
+RoTime:setTimezone("United Kingdom")
+```
+
 ## Removing
 If you'd like to remove a timezone, you can do so by using the `removeTimezone` method. For example, if you wanted to remove the timezone for the United Kingdom, you would do the following:
 ```lua

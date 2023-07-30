@@ -1,7 +1,7 @@
 local Types = require(script.Parent.Parent.typeChecks)
 
 --[=[
-	Sets the global format for all RoTime instances.
+	Do you plan on using just one format throughout your codespace? This method is for you! `setGlobalFormat` will set the global format for all `RoTime` instances that uses a format!
 
 	@method setGlobalFormat
 	@within RoTime

@@ -1,14 +1,14 @@
-# name: CI
+name: CI
 
-# on:
-#   push:
-#     branches:
-#       - master
-#   pull_request:
-#     branches:
-#       - master
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
-# jobs:
+jobs:
 
 #   lint:
 #     name: Lint
@@ -27,12 +27,12 @@
 #       run: |
 #         selene ./src
 
-#   style:
-#     name: Styling
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: actions/checkout@v3
-#     - uses: JohnnyMorganz/stylua-action@1.0.0
-#       with:
-#         token: ${{ SECRETS.GITHUB_TOKEN }}
-#         args: --check .
+  style:
+    name: Styling
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: JohnnyMorganz/stylua-action@1.0.0
+      with:
+        token: ${{ SECRETS.GITHUB_TOKEN }}
+        args: --check .

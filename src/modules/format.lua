@@ -62,7 +62,8 @@ end
 ]=]
 return function(self: Types.RoTime, code: string?): string
 	code = code or self._globalFormat
-	local codeData = self._parser(code)
+
+	local codeData = self._tokenizer(code)
 	local newCode = ""
 	local alreadyDone = {}
 	local nowDate = os.date("!*t", self._now)

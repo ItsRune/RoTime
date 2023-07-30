@@ -1,7 +1,5 @@
 local Types = require(script.Parent.Parent.typeChecks)
 
--- selene: allow(unused_variable)
-
 --[=[
 	Gets the current Unix timestamp with milliseconds.
 

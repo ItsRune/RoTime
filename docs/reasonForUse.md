@@ -19,6 +19,6 @@ local RoTime = require(game.ReplicatedStorage.RoTime).new()
 print(RoTime:getTime()) -- 12:00:00 AM
 print(RoTime:getDate()) -- 1/1/1970
 print(RoTime:getTimezone()) -- UTC
-print(RoTime:format("#h Hours #m Minutes #s Seconds")) -- 0 Hours 0 Minutes 0 Seconds
-print(RoTime:timezone("America/New_York")) -- Changes the timezone to America/New_York
+print(RoTime:format("It's currently hour #h minute #m and second #s")) -- It's currently hour 12 minute 0 and second 0
+print(RoTime:setTimezone("America/New_York")) -- Changes the timezone to America/New_York
 ```

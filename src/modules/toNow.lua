@@ -9,6 +9,7 @@ local Types = require(script.Parent.Parent.typeChecks)
 	@within RoTime
 	@method toNow
 	@tag Chainable
+	@tag Uses Global Format
 
 	@param date string
 

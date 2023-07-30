@@ -85,7 +85,7 @@ local Zones = {
 ]=]
 return {
 	{
-		name = "timezone",
+		name = "setTimezone",
 		func = function(self: Types.RoTime, zone: Types.Zones): Types.RoTime
 			local zoneTime = Zones[zone]
 			if not zoneTime then
