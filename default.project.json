@@ -9,15 +9,6 @@
       }
     },
 
-    "StarterPlayer": {
-      "StarterPlayerScripts": {
-        "Client": {
-          "$className": "Folder",
-          "$path": "src/tests"
-        }
-      }
-    },
-
     "Workspace": {
       "$properties": {
         "FilteringEnabled": true

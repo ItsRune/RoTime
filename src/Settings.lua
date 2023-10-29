@@ -1,7 +1,19 @@
 return {
 	Tokenizer = {
 		toFormat = "#", -- Prefix before tokenizing | "#H:#M:#S" -> {"#H", "#M", "#S"}
+
 		resultShouldIncludeUnknownTokens = true,
+	},
+
+	Patterns = {
+		["h"] = { Type = "hour_12" },
+		["m"] = { Type = "minute" },
+		["s"] = { Type = "second" },
+		["mm"] = { Type = "month" },
+		["dd"] = { Type = "day_short" },
+		["dddd"] = { Type = "day_long" },
+		["yy"] = { Type = "year_short" },
+		["yyyy"] = { Type = "year_long" },
 	},
 
 	Timezones = {
@@ -39,5 +51,17 @@ return {
 		["Africa/Western"] = 1,
 		["Africa/Central"] = 2,
 		["Africa/Eastern"] = 3,
+	},
+
+	Names = {
+		weekDays = {
+			"Sunday",
+			"Monday",
+			"Tuesday",
+			"Wednesday",
+			"Thursday",
+			"Friday",
+			"Saturday",
+		},
 	},
 }
