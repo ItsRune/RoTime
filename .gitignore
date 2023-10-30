@@ -5,6 +5,8 @@
 /src/tests
 /build
 
+/lua-keywords
+
 # Roblox Studio lock files
 /*.rbxlx.lock
 /*.rbxl.lock

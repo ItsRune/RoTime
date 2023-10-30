@@ -3,6 +3,7 @@
 local Settings = require(script.Settings)
 local Tokenizer = require(script.Tokenize)
 local Parser = require(script.Parser)
+local Types = require(script.Types)
 
 --// Module Setup \\--
 local RoTime = {}
@@ -47,13 +48,28 @@ function getTimezoneData(timezoneName: string): { name: string, offset: number }
 	return (data["name"] ~= nil) and data or nil
 end
 
+local function getIncrementFromTimesTable(self: { any }, Type: string)
+	Type = tostring(Type)
+	local found = table.find(Settings.addOrRemoveType, string.lower(Type))
+
+	if not found then
+		self:_warn(`"{string.lower(tostring(Type))}" is an invalid type to change.`)
+		return
+	end
+
+	local beforeCheckDataType = string.upper(string.sub(Type, 1, 1)) .. string.lower(string.sub(Type, 2, #Type))
+	local dataType = (string.sub(beforeCheckDataType, #beforeCheckDataType, #beforeCheckDataType) == "s")
+			and string.sub(beforeCheckDataType, 0, #beforeCheckDataType - 1)
+		or beforeCheckDataType
+
+	return Settings.timesTable[dataType]
+end
+
 --// Public Functions \\--
 function RoTime.new()
 	local self = setmetatable({}, Class)
 
 	self._dt = DateTime.now()
-	self._unixms = self._dt.UnixTimestampMillis
-	self._unix = self._dt.UnixTimestamp
 	self._timezone = {
 		name = "UTC",
 		offset = 0,
@@ -78,7 +94,8 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 		new[index] = value
 	end
 
-	local timeWithZone = DateTime.fromUnixTimestampMillis(self._unixms + (60 * 60 * self._timezone.offset * 1000))
+	local timeWithZone =
+		DateTime.fromUnixTimestampMillis(self._dt.UnixTimestampMillis + (60 * 60 * self._timezone.offset * 1000))
 	local timeValueTable = timeWithZone:ToUniversalTime()
 	local weekDayNumber = (math.floor(timeWithZone.UnixTimestampMillis / 86400) + 1) % 7
 
@@ -140,13 +157,49 @@ function Class:addTimezone(timezoneName: string, timezoneOffset: number)
 	return self
 end
 
+--// Setters \\--
+function Class:add(amount: number, Type: Types.addOrRemoveType)
+	local increment = getIncrementFromTimesTable(Type)
+
+	if not increment then
+		self:_warn("Hmm.. An unexpected issue occurred.")
+		return
+	end
+
+	self._dt = DateTime.fromUnixTimestamp(((amount - self._timezone.offset) * increment))
+end
+
+function Class:sub(amount: number, Type: Types.addOrRemoveType)
+	local increment = getIncrementFromTimesTable(Type)
+
+	if not increment then
+		self:_warn("Hmm.. An unexpected issue occurred.")
+		return
+	end
+
+	self._dt = DateTime.fromUnixTimestamp(((-amount + self._timezone.offset) * increment))
+end
+
+Class.addition = Class.add
+Class.subtract = Class.sub
+
 function Class:set(input: string, format: string)
 	assert(typeof(input) == "string", "error 1")
 	assert(typeof(format) == "string", "error 2")
 
 	local tokens = Tokenizer(format)
 	local parsed = Parser(input, false, tokens)
-	local newUnix = 0
+
+	local current = self._dt:ToUniversalTime()
+	local tbl = {
+		year = current.Year,
+		month = current.Month,
+		day = current.Day,
+		hour = current.Hour,
+		minute = current.Minute,
+		second = current.Second,
+		millisecond = current.Millisecond,
+	}
 
 	local unsupported = {
 		"hour_12",
@@ -154,8 +207,6 @@ function Class:set(input: string, format: string)
 		"month_short",
 		"millis",
 	}
-
-	-- January 1st, 1970 at 00:00:00 UTC
 
 	for _, data: { value: string | number, code: string } in pairs(parsed) do
 		local patternData = Settings.Patterns[data.code]
@@ -172,28 +223,24 @@ function Class:set(input: string, format: string)
 		end
 
 		if token == "hour_24" then
-			newUnix += Settings.timesTable.Hour * data.value
+			tbl.hour = math.clamp(data.value - self._timezone.offset, 1, 24)
 		elseif token == "minute" then
-			newUnix += Settings.timesTable.Minute * data.value
+			tbl.minute = math.clamp(data.value, 0, 60)
 		elseif token == "second" then
-			newUnix += Settings.timesTable.Second * data.value
+			tbl.second = math.clamp(data.value, 0, 60)
 		elseif token == "day_short" or token == "day_long" then
-			newUnix += Settings.timesTable.Day * data.value
+			tbl.day = math.clamp(data.value, 0, 31)
 		elseif token == "year_short" then
-			newUnix += Settings.timesTable.Year * (data.value + 30)
+			tbl.year = (data.value + 2000)
 		elseif token == "year_long" then
-			local str = tostring(data.value)
-			local num = tonumber(string.sub(str, #str - 1, #str))
-
-			newUnix += Settings.timesTable.Year * (num + 30)
+			tbl.year = data.value
 		elseif token == "month" then
-			newUnix += Settings.timesTable.Month * data.value
+			tbl.month = math.clamp(data.value, 1, 12)
 		end
 	end
 
-	self._dt = DateTime.fromUnixTimestamp(newUnix)
-	self._unixms = self._dt.UnixTimestampMillis
-	self._unix = self._dt.UnixTimestamp
+	self._dt =
+		DateTime.fromUniversalTime(tbl.year, tbl.month, tbl.day, tbl.hour, tbl.minute, tbl.second, tbl.millisecond)
 	return self
 end
 

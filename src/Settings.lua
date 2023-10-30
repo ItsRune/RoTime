@@ -15,8 +15,25 @@ return {
 		Hour = 3600,
 		Day = 86400,
 		Week = 604800,
-		Month = 2620800,
-		Year = 31449600,
+		Month = 2628000,
+		Year = 31536000,
+	},
+
+	addOrRemoveTypes = {
+		"second",
+		"seconds",
+		"minute",
+		"minutes",
+		"hour",
+		"hours",
+		"day",
+		"days",
+		"week",
+		"weeks",
+		"month",
+		"months",
+		"year",
+		"years",
 	},
 
 	Patterns = {
