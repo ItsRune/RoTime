@@ -1,3 +1,4 @@
+--!strict
 --// Types \\--
 type token = {
 	code: string,

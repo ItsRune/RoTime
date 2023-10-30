@@ -1,13 +1,15 @@
+--!strict
 type token = {
 	code: string,
 	expected: string,
+	tokenType: string,
 	indexStart: number,
 	indexEnd: number,
 }
 
 type Return = {
 	{
-		value: string,
+		value: (number | string)?,
 		code: string,
 	}?
 }
@@ -43,8 +45,10 @@ local function Parse(input: string, returnUnknownCharacters: boolean?, tokens: {
 			local num = tonumber(character)
 
 			if num == nil then
+				num = tonumber(takenFromString)
+
 				table.insert(parsed, {
-					value = tonumber(takenFromString),
+					value = num,
 					code = currentToken.code,
 				})
 
@@ -61,7 +65,7 @@ local function Parse(input: string, returnUnknownCharacters: boolean?, tokens: {
 
 			if not isOk then
 				table.insert(parsed, {
-					value = tonumber(takenFromString),
+					value = takenFromString,
 					code = currentToken.code,
 				})
 

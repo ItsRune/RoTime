@@ -26,14 +26,8 @@ function getTimezoneData(timezoneName: string): { name: string, offset: number }
 	return (data["name"] ~= nil) and data or nil
 end
 
-local function getIncrementFromTimesTable(self: { any }, Type: string)
+local function getIncrementFromTimesTable(Type: string)
 	Type = tostring(Type)
-	local found = table.find(Settings.addOrRemoveType, string.lower(Type))
-
-	if not found then
-		self:_warn(`"{string.lower(tostring(Type))}" is an invalid type to change.`)
-		return
-	end
 
 	local beforeCheckDataType = string.upper(string.sub(Type, 1, 1)) .. string.lower(string.sub(Type, 2, #Type))
 	local dataType = (string.sub(beforeCheckDataType, #beforeCheckDataType, #beforeCheckDataType) == "s")
@@ -140,6 +134,45 @@ function Class:isLeapYear(): boolean
 	return ((year % 4 == 0 and year % 100 ~= 0) or (year % 400 == 0))
 end
 
+function Class:setFormat(formattingString: string)
+	self._format = formattingString
+	return self
+end
+
+function Class:fromNow(input: string, format: string): number
+	local newTime = RoTime.new()
+	newTime:timezone(self._timezone.name):set(input, format)
+
+	local nowUnix = self._dt.UnixTimestamp
+	local futureUnix = newTime:getDateTime().UnixTimestamp
+
+	if nowUnix > futureUnix then
+		return 0
+	end
+
+	newTime:Destroy()
+	return futureUnix - nowUnix
+end
+
+function Class:toNow(input: string, format: string): number
+	local newTime = RoTime.new()
+	newTime:timezone(self._timezone.name):set(input, format)
+
+	local nowUnix = self._dt.UnixTimestamp
+	local pastUnix = newTime:getDateTime().UnixTimestamp
+
+	if nowUnix < pastUnix then
+		return 0
+	end
+
+	newTime:Destroy()
+	return nowUnix - pastUnix
+end
+
+function Class:getDateTime()
+	return self._dt
+end
+
 --// Setters \\--
 function Class:add(amount: number, Type: Types.addOrRemoveType)
 	local increment = getIncrementFromTimesTable(Type)
@@ -239,6 +272,12 @@ function Class:format(input: string): string
 	end)
 
 	return table.concat(resultingData, "")
+end
+
+function Class:Destroy()
+	table.clear(self)
+	setmetatable(self, nil)
+	self = nil
 end
 
 return setmetatable(RoTime, {
