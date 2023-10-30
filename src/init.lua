@@ -4,6 +4,7 @@ local Settings = require(script.Settings)
 local Tokenizer = require(script.Tokenize)
 local Parser = require(script.Parser)
 local Types = require(script.Types)
+local Table = require(script.Table)
 
 --// Module Setup \\--
 local RoTime = {}
@@ -11,29 +12,6 @@ local Class = {}
 Class.__index = Class
 
 --// Functions \\--
--- local function Filter<T>(tbl: { T }, predicate: (data: T) -> boolean): { T }
--- 	local new = table.create(#tbl, 1)
-
--- 	for _, v: T in ipairs(tbl) do
--- 		if predicate(v) then
--- 			table.insert(new, v)
--- 		end
--- 	end
-
--- 	return new
--- end
-
-local function Map<T, K>(tbl: { T }, callback: (value: T, index: any, tbl: { T }) -> K): { K }
-	local new = {}
-
-	for index, value in pairs(tbl) do
-		local result = callback(value, index, tbl)
-		table.insert(new, result)
-	end
-
-	return new
-end
-
 function getTimezoneData(timezoneName: string): { name: string, offset: number }?
 	local data = {}
 
@@ -157,6 +135,11 @@ function Class:addTimezone(timezoneName: string, timezoneOffset: number)
 	return self
 end
 
+function Class:isLeapYear(): boolean
+	local year = self._dt:ToUniversalTime().Year
+	return ((year % 4 == 0 and year % 100 ~= 0) or (year % 400 == 0))
+end
+
 --// Setters \\--
 function Class:add(amount: number, Type: Types.addOrRemoveType)
 	local increment = getIncrementFromTimesTable(Type)
@@ -247,11 +230,11 @@ end
 function Class:format(input: string): string
 	local tokens = Tokenizer(input)
 
-	local bulkData = self:_getTokenInformation(Map(tokens, function(value)
+	local bulkData = self:_getTokenInformation(Table.Map(tokens, function(value)
 		return (value.expected == "Unknown") and value.code or value.expected
 	end))
 
-	local resultingData = Map(tokens, function(value)
+	local resultingData = Table.Map(tokens, function(value)
 		return bulkData[(value.expected == "Unknown") and value.code or value.expected]
 	end)
 
