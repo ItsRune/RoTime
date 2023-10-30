@@ -2,6 +2,7 @@
 type token = {
 	code: string,
 	expected: string,
+	tokenType: string,
 	indexStart: number,
 	indexEnd: number,
 }
@@ -15,9 +16,7 @@ local function tokenize(input: string): { { token }? }
 
 	local isCapturing = false
 	local currentCapture = ""
-	local captureStartedAt, captureEndedAt = 0, 0
-	local strLen = string.len(input)
-	local strIndex = 0
+	local captureStartedAt, captureEndedAt, strIndex, strLen = 0, 0, 0, string.len(input)
 	local tokens = {}
 
 	local function resetCaptureGroup()
@@ -30,7 +29,8 @@ local function tokenize(input: string): { { token }? }
 		local pattern = Settings.Patterns[currentCapture]
 		table.insert(tokens, {
 			code = currentCapture,
-			expected = pattern.Type,
+			expected = pattern.expectedType,
+			tokenType = pattern.Type,
 			indexStart = captureStartedAt,
 			indexEnd = captureEndedAt,
 		})
@@ -77,6 +77,7 @@ local function tokenize(input: string): { { token }? }
 					table.insert(tokens, {
 						code = character,
 						expected = "Unknown",
+						Type = "string",
 						indexStart = strIndex,
 						indexEnd = strIndex,
 					})

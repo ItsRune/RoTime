@@ -5,15 +5,33 @@ return {
 		resultShouldIncludeUnknownTokens = true,
 	},
 
+	RegularExpressions = {
+		"[%d%d%d%d]%-[%d%d]%-[%d%d]T[%d%d]:[%d%d]:[%d%d]Z", -- 2020-01-02T10:30:45Z
+	},
+
+	timesTable = {
+		Second = 1,
+		Minute = 60,
+		Hour = 3600,
+		Day = 86400,
+		Week = 604800,
+		Month = 2620800,
+		Year = 31449600,
+	},
+
 	Patterns = {
-		["h"] = { Type = "hour_12" },
-		["m"] = { Type = "minute" },
-		["s"] = { Type = "second" },
-		["mm"] = { Type = "month" },
-		["dd"] = { Type = "day_short" },
-		["dddd"] = { Type = "day_long" },
-		["yy"] = { Type = "year_short" },
-		["yyyy"] = { Type = "year_long" },
+		["h"] = { expectedType = "hour_12", Type = "number" },
+		["hh"] = { expectedType = "hour_24", Type = "number" },
+		["m"] = { expectedType = "minute", Type = "number" },
+		["s"] = { expectedType = "second", Type = "number" },
+		["mm"] = { expectedType = "month", Type = "number" },
+		["mmm"] = { expectedType = "month_short", Type = "string" },
+		["mmmm"] = { expectedType = "month_long", Type = "string" },
+		["dd"] = { expectedType = "day_short", Type = "number" },
+		["dddd"] = { expectedType = "day_long", Type = "string" },
+		["yy"] = { expectedType = "year_short", Type = "number" },
+		["yyyy"] = { expectedType = "year_long", Type = "number" },
+		["z"] = { expectedType = "timezone", Type = "string" },
 	},
 
 	Timezones = {
@@ -62,6 +80,21 @@ return {
 			"Thursday",
 			"Friday",
 			"Saturday",
+		},
+
+		Months = {
+			"January",
+			"February",
+			"March",
+			"April",
+			"May",
+			"June",
+			"July",
+			"August",
+			"September",
+			"October",
+			"November",
+			"December",
 		},
 	},
 }

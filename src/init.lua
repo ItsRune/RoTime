@@ -2,6 +2,7 @@
 --// Variables \\--
 local Settings = require(script.Settings)
 local Tokenizer = require(script.Tokenize)
+local Parser = require(script.Parser)
 
 --// Module Setup \\--
 local RoTime = {}
@@ -104,6 +105,10 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 			insert(token, string.sub(str, #str - 1, #str))
 		elseif token == "month" then
 			insert(token, timeValueTable.Month)
+		elseif token == "month_long" then
+			insert(token, Settings.Names.Months[timeValueTable.Month])
+		elseif token == "month_short" then
+			insert(token, string.sub(Settings.Names.Months[timeValueTable.Month], 1, 3))
 		else
 			insert(token, token)
 		end
@@ -132,6 +137,63 @@ function Class:addTimezone(timezoneName: string, timezoneOffset: number)
 	end
 
 	Settings.Timezones[timezoneName] = timezoneOffset
+	return self
+end
+
+function Class:set(input: string, format: string)
+	assert(typeof(input) == "string", "error 1")
+	assert(typeof(format) == "string", "error 2")
+
+	local tokens = Tokenizer(format)
+	local parsed = Parser(input, false, tokens)
+	local newUnix = 0
+
+	local unsupported = {
+		"hour_12",
+		"month_long",
+		"month_short",
+		"millis",
+	}
+
+	-- January 1st, 1970 at 00:00:00 UTC
+
+	for _, data: { value: string | number, code: string } in pairs(parsed) do
+		local patternData = Settings.Patterns[data.code]
+
+		if not patternData then
+			continue
+		end
+
+		local token = patternData.expectedType
+
+		if table.find(unsupported, token) then
+			self:_warn(`"{token}" is not supported for ":set"!`)
+			continue
+		end
+
+		if token == "hour_24" then
+			newUnix += Settings.timesTable.Hour * data.value
+		elseif token == "minute" then
+			newUnix += Settings.timesTable.Minute * data.value
+		elseif token == "second" then
+			newUnix += Settings.timesTable.Second * data.value
+		elseif token == "day_short" or token == "day_long" then
+			newUnix += Settings.timesTable.Day * data.value
+		elseif token == "year_short" then
+			newUnix += Settings.timesTable.Year * (data.value + 30)
+		elseif token == "year_long" then
+			local str = tostring(data.value)
+			local num = tonumber(string.sub(str, #str - 1, #str))
+
+			newUnix += Settings.timesTable.Year * (num + 30)
+		elseif token == "month" then
+			newUnix += Settings.timesTable.Month * data.value
+		end
+	end
+
+	self._dt = DateTime.fromUnixTimestamp(newUnix)
+	self._unixms = self._dt.UnixTimestampMillis
+	self._unix = self._dt.UnixTimestamp
 	return self
 end
 
