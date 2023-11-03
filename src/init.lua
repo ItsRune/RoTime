@@ -1,4 +1,6 @@
 --!strict
+--- @class RoTime
+
 --// Variables \\--
 local Settings = require(script.Settings)
 local Tokenizer = require(script.Tokenize)
@@ -10,6 +12,12 @@ local Table = require(script.Table)
 local RoTime = {}
 local Class = {}
 Class.__index = Class
+
+--// Documentation Types \\--
+--[=[
+	@type additionSubtractionInterface "second" | "minute" | "hour" | "day" | "week" | "month" | "year"
+	@within RoTime
+]=]
 
 --// Functions \\--
 function getTimezoneData(timezoneName: string): { name: string, offset: number }?
@@ -38,6 +46,14 @@ local function getIncrementFromTimesTable(Type: string)
 end
 
 --// Public Functions \\--
+--[=[
+	Constructs a new class.
+	@return RoTime
+
+	@tag Constructor
+	@since 2.0.0
+	@within RoTime
+]=]
 function RoTime.new()
 	local self = setmetatable({}, Class)
 
@@ -51,10 +67,24 @@ function RoTime.new()
 end
 
 --// Private Functions \\--
+--[=[
+	Warns to the console with a prefix.
+
+	@private
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:_warn(...: string)
 	warn("[RoTime]:", ...)
 end
 
+--[=[
+	Gets a token's information.
+
+	@private
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:_getTokenInformation(tokenExpected: { string }): { [string]: string | number }
 	local new = {}
 
@@ -98,6 +128,16 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 			insert(token, Settings.Names.Months[timeValueTable.Month])
 		elseif token == "month_short" then
 			insert(token, string.sub(Settings.Names.Months[timeValueTable.Month], 1, 3))
+		elseif token == "week_day" then
+			insert(token, weekDayNumber)
+		elseif token == "week_year" then
+			-- local firstThursday = weekDayNumber + ((weekDayNumber + 6) % 7)
+			insert(token, "Not implemented")
+		elseif token == "year_day" then
+			-- day 100 / 365
+			local timeFrame = self:toNow("1/1", "#mm/#dd")
+			local difference = self._dt.UnixTimestamp - timeFrame
+			insert(token, math.floor(difference / Settings.timesTable.Day))
 		else
 			insert(token, token)
 		end
@@ -106,6 +146,13 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 	return new
 end
 
+--[=[
+	Sets the timezone to the specified timezone.
+	@return RoTime
+
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:timezone(newTimezone: string)
 	local timezoneData = getTimezoneData(newTimezone)
 
@@ -120,6 +167,15 @@ function Class:timezone(newTimezone: string)
 	return self
 end
 
+--[=[
+	Creates a new timezone with the designated offset.
+	@param timezoneName string
+	@param timezoneOffset number
+	@return RoTime
+
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:addTimezone(timezoneName: string, timezoneOffset: number)
 	if not tonumber(timezoneOffset) then
 		self:_warn("The new timezone offset has to be of type 'number'.")
@@ -129,16 +185,40 @@ function Class:addTimezone(timezoneName: string, timezoneOffset: number)
 	return self
 end
 
+--[=[
+	Checks if the current time is a leap year.
+	@return boolean
+
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:isLeapYear(): boolean
 	local year = self._dt:ToUniversalTime().Year
 	return ((year % 4 == 0 and year % 100 ~= 0) or (year % 400 == 0))
 end
 
+--[=[
+	Sets the format if none is provided in methods.
+	@return RoTime
+
+	@tag Chainable
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:setFormat(formattingString: string)
 	self._format = formattingString
 	return self
 end
 
+--[=[
+	Takes a future time and calculates the difference, returning time duration.
+	@param input string
+	@param format string?
+	@return number
+
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:fromNow(input: string, format: string): number
 	local newTime = RoTime.new()
 	newTime:timezone(self._timezone.name):set(input, format)
@@ -151,9 +231,18 @@ function Class:fromNow(input: string, format: string): number
 	end
 
 	newTime:Destroy()
-	return futureUnix - nowUnix
+	return math.abs(futureUnix - nowUnix)
 end
 
+--[=[
+	Takes a past time and calculates the difference, returning time duration.
+	@param input string
+	@param format string?
+	@return number
+
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:toNow(input: string, format: string): number
 	local newTime = RoTime.new()
 	newTime:timezone(self._timezone.name):set(input, format)
@@ -166,15 +255,63 @@ function Class:toNow(input: string, format: string): number
 	end
 
 	newTime:Destroy()
-	return nowUnix - pastUnix
+	return math.abs(nowUnix - pastUnix)
 end
 
+--[=[
+	Gets the DateTime Instance.
+	@return DateTime
+
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:getDateTime()
 	return self._dt
 end
 
 --// Setters \\--
-function Class:add(amount: number, Type: Types.addOrRemoveType)
+--[=[
+	Adds an amount of time based on the addition/subtraction type.
+	@param amount number
+	@param Type additionSubtractionInterface
+	@return RoTime
+
+	:::info
+	`RoTime:add(amount, Type)` also works with this method.
+	:::
+
+	@tag Chainable
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:addition(amount: number, Type: Types.addOrRemoveType)
+	local increment = getIncrementFromTimesTable(Type)
+
+	if not increment then
+		self:_warn("Hmm.. An unexpected issue occurred.")
+		return
+	end
+
+	self._dt = DateTime.fromUnixTimestamp(((amount + self._timezone.offset) * increment))
+	return self
+end
+Class.add = Class.addition
+
+--[=[
+	Subtracts an amount of time based on the addition/subtraction type.
+	@param amount number
+	@param Type additionSubtractionInterface
+	@return RoTime
+
+	:::info
+	`RoTime:sub(amount, Type)` also works with this method.
+	:::
+
+	@tag Chainable
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:subtract(amount: number, Type: Types.addOrRemoveType)
 	local increment = getIncrementFromTimesTable(Type)
 
 	if not increment then
@@ -183,22 +320,20 @@ function Class:add(amount: number, Type: Types.addOrRemoveType)
 	end
 
 	self._dt = DateTime.fromUnixTimestamp(((amount - self._timezone.offset) * increment))
+	return self
 end
+Class.sub = Class.subtract
 
-function Class:sub(amount: number, Type: Types.addOrRemoveType)
-	local increment = getIncrementFromTimesTable(Type)
+--[=[
+	Sets the time to the specified input and format.
+	@param input string
+	@param format string?
+	@return RoTime
 
-	if not increment then
-		self:_warn("Hmm.. An unexpected issue occurred.")
-		return
-	end
-
-	self._dt = DateTime.fromUnixTimestamp(((-amount + self._timezone.offset) * increment))
-end
-
-Class.addition = Class.add
-Class.subtract = Class.sub
-
+	@tag Chainable
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:set(input: string, format: string)
 	assert(typeof(input) == "string", "error 1")
 	assert(typeof(format) == "string", "error 2")
@@ -239,7 +374,7 @@ function Class:set(input: string, format: string)
 		end
 
 		if token == "hour_24" then
-			tbl.hour = math.clamp(data.value - self._timezone.offset, 1, 24)
+			tbl.hour = math.clamp(data.value - self._timezone.offset, 0, 23)
 		elseif token == "minute" then
 			tbl.minute = math.clamp(data.value, 0, 60)
 		elseif token == "second" then
@@ -260,6 +395,15 @@ function Class:set(input: string, format: string)
 	return self
 end
 
+--[=[
+	Formats the current time with certain formatting parameters.
+	@param input string
+	@return string
+
+	@tag Chainable
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:format(input: string): string
 	local tokens = Tokenizer(input)
 
@@ -274,6 +418,13 @@ function Class:format(input: string): string
 	return table.concat(resultingData, "")
 end
 
+--[=[
+	Destroys the module and cleans methods.
+	@return nil
+
+	@since 2.0.0
+	@within RoTime
+]=]
 function Class:Destroy()
 	table.clear(self)
 	setmetatable(self, nil)

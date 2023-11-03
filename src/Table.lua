@@ -6,6 +6,7 @@
 
 --[=[
 	@class TableUtil
+	@ignore
 
 	A collection of helpful table utility functions. Many of these functions are carried over from JavaScript or
 	Python that are not present in Lua.
