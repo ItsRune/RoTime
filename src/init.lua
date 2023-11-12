@@ -110,15 +110,14 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 		new[index] = value
 	end
 
-	local timeWithZone =
-		DateTime.fromUnixTimestampMillis(self._dt.UnixTimestampMillis + (60 * 60 * self._timezone.offset * 1000))
+	local timeWithZone = self:getDateTime()
 	local timeValueTable = timeWithZone:ToUniversalTime()
 	local weekDayNumber = (math.floor(timeWithZone.UnixTimestampMillis / 86400) + 1) % 7
 
 	for _, token in pairs(tokenExpected) do
 		if token == "hour_12" then
 			local result = (timeValueTable.Hour + 1) % 12
-			insert(token, (result == 0) and 12 or result - 1)
+			insert(token, (result == 0) and 12 or result)
 		elseif token == "hour_24" then
 			insert(token, timeValueTable.Hour + 1)
 		elseif token == "minute" then
@@ -146,11 +145,11 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 			insert(token, weekDayNumber)
 		elseif token == "week_year" then
 			-- local firstThursday = weekDayNumber + ((weekDayNumber + 6) % 7)
-			insert(token, "Not implemented")
+			insert(token, "Not_implemented")
 		elseif token == "year_day" then
 			-- day 100 / 365
 			local timeFrame = self:toNow("1/1", "#mm/#dd")
-			local difference = self._dt.UnixTimestamp - timeFrame
+			local difference = self:getDateTime().UnixTimestamp - timeFrame
 			insert(token, math.floor(difference / Settings.timesTable.Day))
 		else
 			insert(token, token)
@@ -207,7 +206,7 @@ end
 	@within RoTime
 ]=]
 function Class:isLeapYear(): boolean
-	local year = self._dt:ToUniversalTime().Year
+	local year = self:getDateTime():ToUniversalTime().Year
 	return ((year % 4 == 0 and year % 100 ~= 0) or (year % 400 == 0))
 end
 
@@ -237,7 +236,7 @@ function Class:fromNow(input: string, format: string): number
 	local newTime = RoTime.new()
 	newTime:timezone(self._timezone.name):set(input, format)
 
-	local nowUnix = self._dt.UnixTimestamp
+	local nowUnix = self:getDateTime().UnixTimestamp
 	local futureUnix = newTime:getDateTime().UnixTimestamp
 
 	if nowUnix > futureUnix then
@@ -261,7 +260,7 @@ function Class:toNow(input: string, format: string): number
 	local newTime = RoTime.new()
 	newTime:timezone(self._timezone.name):set(input, format)
 
-	local nowUnix = self._dt.UnixTimestamp
+	local nowUnix = self:getDateTime().UnixTimestamp
 	local pastUnix = newTime:getDateTime().UnixTimestamp
 
 	if nowUnix < pastUnix then
@@ -280,7 +279,9 @@ end
 	@within RoTime
 ]=]
 function Class:getDateTime()
-	return self._dt
+	return DateTime.fromUnixTimestampMillis(
+		self:getDateTime().UnixTimestampMillis + (60 * 60 * self._timezone.offset * 1000)
+	)
 end
 
 --[=[
@@ -303,6 +304,43 @@ end
 ]=]
 function Class:getTime()
 	return self:format("#hh:#m:#s")
+end
+
+--[=[
+	Gets the calender for the month.
+	@return { amountOfDays: number, year: number, isLeapYear: boolean, days: { { dayName: string, isToday: boolean } } }
+
+	@since 2.0.1
+	@within RoTime
+]=]
+function Class:getCalender(): {
+	amountOfDays: number,
+	isLeapYear: boolean,
+	days: { { dayName: string, Day: number, isToday: boolean } },
+	year: number,
+}
+	local dateTime = self:getDateTime()
+	local universal = dateTime:ToUniversalTime()
+	local calender = {
+		amountOfDays = (universal.Month == 2) and 28 or 31,
+		year = universal.Year,
+		isLeapYear = self:isLeapYear(),
+		days = {},
+	}
+
+	for i = 1, calender.amountOfDays do
+		local dayName = (Settings.Names.weekDays)[os.date(
+			"*t",
+			os.time({ year = calender.year, month = universal.Month, day = i })
+		).wday]
+
+		calender.days[i] = {
+			dayName = dayName,
+			isToday = (i == universal.Day),
+		}
+	end
+
+	return calender
 end
 
 --// Setters \\--
@@ -377,7 +415,7 @@ function Class:set(input: string, format: string)
 	local tokens = Tokenizer(format)
 	local parsed = Parser(input, false, tokens)
 
-	local current = self._dt:ToUniversalTime()
+	local current = self:getDateTime():ToUniversalTime()
 	local tbl = {
 		year = current.Year,
 		month = current.Month,

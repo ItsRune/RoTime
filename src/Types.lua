@@ -57,6 +57,18 @@ export type RoTime = {
 	isLeapYear: (self: RoTime) -> boolean,
 
 	_getTokenInformation: (tokenExpected: { string }) -> { [string]: string | number },
+	getCalender: (
+	) -> {
+		amountOfDays: number,
+		year: number,
+		isLeapYear: boolean,
+		days: {
+			{
+				dayName: string,
+				isToday: boolean,
+			}
+		},
+	},
 
 	addition: (self: RoTime, amount: number, Type: addOrRemoveType) -> RoTime,
 	add: (self: RoTime, amount: number, Type: addOrRemoveType) -> RoTime,

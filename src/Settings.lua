@@ -65,7 +65,7 @@ return {
 		["CET"] = 1,
 
 		["America/Philidolphia"] = 0,
-		["America/New_York"] = -4,
+		["America/New_York"] = -6,
 		["America/Los_Angeles"] = -7,
 
 		["Europe/London"] = 1,

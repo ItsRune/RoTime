@@ -9,14 +9,14 @@
 
 ## About <a name = "about"></a>
 
-RoTime is a roblox module for manipulating, parsing, timezoning, and validating times. Currently this project is a work in progress and is not intended for published applications.
+RoTime is a lightweight roblox module for manipulating, parsing, and validating times.
 
 ## Getting Started <a name = "getting_started"></a>
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. Installation is pretty simple, just get the [module](https://www.roblox.com/library/10459870631/RoTime) and place it into `ReplicatedStorage` then you're basically finished.
 
 ```lua
-local RoTime = require(game:GetService("ReplicatedStorage"):WaitForChild("RoTime"))
+local RoTime = require(10459870631)
 ```
 
 ## Usage <a name = "usage"></a>
@@ -49,7 +49,7 @@ print(oneMinuteBehind:format("#h:#m")) --> 1:35
 ##### Creating Timers
 ```lua
 -- (howLong : number, type : string, step, startAt)
-local myTimer = RoTime.new():createTimer(1, "minute", 1, 0)
+local myTimer = RoTime.new().Timer(1, "minute", 1, 0)
 ```
 
 ##### Functions
@@ -63,11 +63,11 @@ myTimer:Cancel() -- Cancels the timer entirely.
 ##### Connections
 ```lua
 -- elapsedTime will always be how many seconds since start.
-myTimer.OnUpdate:Connect(function(elapsedTime)
+myTimer.Changed:Connect(function(elapsedTime)
     print("myTimer's elapsed time: " .. elapsedTime)
 end)
 
-myTimer.OnCompletion:Connect(function()
-    print("myTimer's finished!")
+myTimer.Completed:Connect(function(elapsedTime, startingTime)
+    print("myTimer's finished!", "It elapsed " .. elapsedTime .. " seconds since start, and started at " .. startingTime .. " seconds.")
 end)
 ```
