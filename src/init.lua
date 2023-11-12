@@ -1,12 +1,18 @@
 --!strict
 --- @class RoTime
 
+--[=[
+	@prop Timer (start: number, finish: number, increment: number?) -> Timer
+	@within RoTime
+]=]
+
 --// Variables \\--
 local Settings = require(script.Settings)
 local Tokenizer = require(script.Tokenize)
 local Parser = require(script.Parser)
 local Types = require(script.Types)
 local Table = require(script.Table)
+local Timer = require(script.Timer)
 
 --// Module Setup \\--
 local RoTime = {}
@@ -54,7 +60,7 @@ end
 	@since 2.0.0
 	@within RoTime
 ]=]
-function RoTime.new()
+function RoTime.new(): Types.RoTime
 	local self = setmetatable({}, Class)
 
 	self._dt = DateTime.now()
@@ -62,6 +68,14 @@ function RoTime.new()
 		name = "UTC",
 		offset = 0,
 	}
+
+	self.Timer = setmetatable({}, {
+		__call = function(tbl, ...)
+			local timer = Timer.new(...)
+			rawset(tbl, timer._id, timer)
+			return timer
+		end,
+	})
 
 	return self
 end
@@ -269,6 +283,28 @@ function Class:getDateTime()
 	return self._dt
 end
 
+--[=[
+	Gets the Date.
+	@return string
+
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:getDate()
+	return self:format("#dd/#mm/#yyyy")
+end
+
+--[=[
+	Gets the Time.
+	@return string
+
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:getTime()
+	return self:format("#hh:#m:#s")
+end
+
 --// Setters \\--
 --[=[
 	Adds an amount of time based on the addition/subtraction type.
@@ -276,7 +312,7 @@ end
 	@param Type additionSubtractionInterface
 	@return RoTime
 
-	:::info
+	:::info HEY
 	`RoTime:add(amount, Type)` also works with this method.
 	:::
 
@@ -303,7 +339,7 @@ Class.add = Class.addition
 	@param Type additionSubtractionInterface
 	@return RoTime
 
-	:::info
+	:::info HEY
 	`RoTime:sub(amount, Type)` also works with this method.
 	:::
 
