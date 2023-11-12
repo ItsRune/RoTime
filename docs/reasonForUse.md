@@ -14,7 +14,7 @@ Let's face it, we've all been there. Whether it's creating a countdown timer, fo
 ### Examples
 
 ```lua
-local RoTime = require(game.ReplicatedStorage.RoTime).new()
+local RoTime = require(10459870631).new()
 
 print(RoTime:getTime()) -- 12:00:00 AM
 print(RoTime:getDate()) -- 1/1/1970

@@ -41,6 +41,7 @@ return {
 		["hh"] = { expectedType = "hour_24", Type = "number" },
 		["m"] = { expectedType = "minute", Type = "number" },
 		["s"] = { expectedType = "second", Type = "number" },
+		["ms"] = { expectedType = "millis", Type = "number" },
 		["mm"] = { expectedType = "month", Type = "number" },
 		["mmm"] = { expectedType = "month_short", Type = "string" },
 		["mmmm"] = { expectedType = "month_long", Type = "string" },

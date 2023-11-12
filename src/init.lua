@@ -143,6 +143,8 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 			insert(token, string.sub(Settings.Names.Months[timeValueTable.Month], 1, 3))
 		elseif token == "week_day" then
 			insert(token, weekDayNumber)
+		elseif token == "timezone" then
+			insert(token, self._timezone.name)
 		elseif token == "week_year" then
 			-- local firstThursday = weekDayNumber + ((weekDayNumber + 6) % 7)
 			insert(token, "Not_implemented")
@@ -329,6 +331,7 @@ function Class:getCalender(): {
 	}
 
 	for i = 1, calender.amountOfDays do
+		-- A little hacky, but it will suffice.
 		local dayName = (Settings.Names.weekDays)[os.date(
 			"*t",
 			os.time({ year = calender.year, month = universal.Month, day = i })
