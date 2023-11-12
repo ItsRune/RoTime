@@ -51,6 +51,7 @@ function Timer.new(start: number, finish: number, increment: number?)
 		assert(false, "Start or Finish has to be of type 'number'!")
 	end
 
+	-- Use Heartbeat in case user uses this on the server.
 	table.insert(
 		self._maid,
 		RunService.Heartbeat:Connect(function()

@@ -323,8 +323,17 @@ function Class:getCalender(): {
 }
 	local dateTime = self:getDateTime()
 	local universal = dateTime:ToUniversalTime()
+	local isLeapYear = self:isLeapYear()
+	local currentMonth = universal.Month
+	local daysCount = 31
+
+	-- Feburary is a stupid month tbh.
+	if currentMonth == 2 then
+		daysCount = isLeapYear and 29 or 28
+	end
+
 	local calender = {
-		amountOfDays = (universal.Month == 2) and 28 or 31,
+		amountOfDays = daysCount,
 		year = universal.Year,
 		isLeapYear = self:isLeapYear(),
 		days = {},
@@ -429,11 +438,15 @@ function Class:set(input: string, format: string)
 		millisecond = current.Millisecond,
 	}
 
-	local unsupported = {
+	local unsupportedTokens = {
 		"hour_12",
 		"month_long",
 		"month_short",
 		"millis",
+		"ampm",
+		"timezone",
+		"week_year", -- Not implemented
+		"year_day", -- To complicated to do atm.
 	}
 
 	for _, data: { value: string | number, code: string } in pairs(parsed) do
@@ -445,7 +458,7 @@ function Class:set(input: string, format: string)
 
 		local token = patternData.expectedType
 
-		if table.find(unsupported, token) then
+		if table.find(unsupportedTokens, token) then
 			self:_warn(`"{token}" is not supported for ":set"!`)
 			continue
 		end
