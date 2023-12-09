@@ -53,6 +53,8 @@ return {
 		["z"] = { expectedType = "timezone", Type = "string" },
 		["w"] = { expectedType = "week_day", Type = "number" },
 		["ww"] = { expectedType = "week_year", Type = "number" },
+		["u"] = { expectedType = "unix", Type = "number" },
+		["uu"] = { expectedType = "unix_ms", Type = "number" },
 	},
 
 	Timezones = {

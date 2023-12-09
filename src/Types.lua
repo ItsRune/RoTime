@@ -76,6 +76,7 @@ export type RoTime = {
 	sub: (self: RoTime, amount: number, Type: addOrRemoveType) -> RoTime,
 	set: (self: RoTime, input: string, format: string) -> RoTime,
 	addTimezone: (self: RoTime, timezoneName: string, timezoneOffset: number) -> RoTime,
+	removeTimezone: (self: RoTime, timezoneName: string) -> RoTime,
 	timezone: (self: RoTime, timezoneName: string) -> RoTime,
 	setFormat: (self: RoTime, formattingString: string) -> RoTime,
 
@@ -85,5 +86,6 @@ export type RoTime = {
 	format: (self: RoTime, format: string) -> string,
 	getTime: (self: RoTime) -> string,
 	getDate: (self: RoTime) -> string,
+	getTimestamp: (self: RoTime) -> string,
 }
 return nil

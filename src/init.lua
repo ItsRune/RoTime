@@ -117,44 +117,48 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 	for _, token in pairs(tokenExpected) do
 		if token == "hour_12" then
 			local result = (timeValueTable.Hour + 1) % 12
-			insert(token, (result == 0) and 12 or result)
+			insert(token, tostring((result == 0) and 12 or result))
 		elseif token == "hour_24" then
-			insert(token, timeValueTable.Hour + 1)
+			insert(token, tostring(timeValueTable.Hour + 1))
 		elseif token == "minute" then
-			insert(token, timeValueTable.Minute)
+			insert(token, tostring(timeValueTable.Minute))
 		elseif token == "second" then
-			insert(token, timeValueTable.Second)
+			insert(token, tostring(timeValueTable.Second))
 		elseif token == "millis" then
-			insert(token, timeValueTable.Millisecond)
+			insert(token, tostring(timeValueTable.Millisecond))
 		elseif token == "day_short" then
-			insert(token, timeValueTable.Day)
+			insert(token, tostring(timeValueTable.Day))
 		elseif token == "day_long" then
-			insert(token, Settings.Names.weekDays[weekDayNumber])
+			insert(token, tostring(Settings.Names.weekDays[weekDayNumber]))
 		elseif token == "year_long" then
-			insert(token, timeValueTable.Year)
+			insert(token, tostring(timeValueTable.Year))
 		elseif token == "year_short" then
 			local str = tostring(timeValueTable.Year)
-			insert(token, string.sub(str, #str - 1, #str))
+			insert(token, tostring(string.sub(str, #str - 1, #str)))
 		elseif token == "month" then
-			insert(token, timeValueTable.Month)
+			insert(token, tostring(timeValueTable.Month))
 		elseif token == "month_long" then
-			insert(token, Settings.Names.Months[timeValueTable.Month])
+			insert(token, tostring(Settings.Names.Months[timeValueTable.Month]))
 		elseif token == "month_short" then
-			insert(token, string.sub(Settings.Names.Months[timeValueTable.Month], 1, 3))
+			insert(token, tostring(string.sub(Settings.Names.Months[timeValueTable.Month], 1, 3)))
 		elseif token == "week_day" then
-			insert(token, weekDayNumber)
+			insert(token, tostring(weekDayNumber))
 		elseif token == "timezone" then
-			insert(token, self._timezone.name)
+			insert(token, tostring(self._timezone.name))
 		elseif token == "week_year" then
 			-- local firstThursday = weekDayNumber + ((weekDayNumber + 6) % 7)
-			insert(token, "Not_implemented")
+			insert(token, tostring("Not_implemented"))
 		elseif token == "year_day" then
 			-- day 100 / 365
 			local timeFrame = self:toNow("1/1", "#mm/#dd")
 			local difference = self:getDateTime().UnixTimestamp - timeFrame
-			insert(token, math.floor(difference / Settings.timesTable.Day))
+			insert(token, tostring(math.floor(difference / Settings.timesTable.Day)))
+		elseif token == "unix" then
+			insert(token, tostring(self._dt.UnixTimestamp))
+		elseif token == "unix_ms" then
+			insert(token, tostring(self._dt.UnixTimestampMillis))
 		else
-			insert(token, token)
+			insert(token, tostring(token))
 		end
 	end
 
@@ -201,6 +205,19 @@ function Class:addTimezone(timezoneName: string, timezoneOffset: number)
 end
 
 --[=[
+	Removes a timezone by it's name.
+	@param timezoneName string
+	@return RoTime
+
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:removeTimezone(timezoneName: string)
+	Settings.Timezones[timezoneName] = nil
+	return self
+end
+
+--[=[
 	Checks if the current time is a leap year.
 	@return boolean
 
@@ -223,6 +240,20 @@ end
 function Class:setFormat(formattingString: string)
 	self._format = formattingString
 	return self
+end
+
+--[=[
+	Takes a future time and calculates the difference, returning time duration.
+	@param input string
+	@param format string?
+	@return number
+
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:fromUnix(unix: number, isMillisecond: boolean?): Types.RoTime
+	local methodToUse = isMillisecond and "fromUnixTimestamp" or "fromUnixTimestampMillis"
+	self._dt = DateTime[methodToUse](unix)
 end
 
 --[=[
@@ -281,9 +312,7 @@ end
 	@within RoTime
 ]=]
 function Class:getDateTime()
-	return DateTime.fromUnixTimestampMillis(
-		self:getDateTime().UnixTimestampMillis + (60 * 60 * self._timezone.offset * 1000)
-	)
+	return DateTime.fromUnixTimestampMillis(self._dt.UnixTimestampMillis + (60 * 60 * self._timezone.offset * 1000))
 end
 
 --[=[
@@ -306,6 +335,41 @@ end
 ]=]
 function Class:getTime()
 	return self:format("#hh:#m:#s")
+end
+
+--[=[
+	Gets the format used for timestamps.
+	@return string
+
+	@since 2.1.0
+	@within RoTime
+]=]
+function Class:getTimestamp()
+	local dateData = self:getDateTime():ToUniversalTime()
+
+	local function addZeroInFront(value: number)
+		if value < 10 then
+			return "0" .. tostring(value)
+		end
+		return tostring(value)
+	end
+
+	local formatted = dateData.Year
+		.. "-"
+		.. addZeroInFront(dateData.Month)
+		.. "-"
+		.. addZeroInFront(dateData.Day)
+		.. "T"
+		.. addZeroInFront(dateData.Hour)
+		.. ":"
+		.. addZeroInFront(dateData.Minute)
+		.. ":"
+		.. addZeroInFront(dateData.Second)
+		.. "."
+		.. dateData.Millisecond
+		.. "Z"
+
+	return formatted
 end
 
 --[=[

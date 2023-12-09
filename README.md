@@ -48,8 +48,18 @@ print(oneMinuteBehind:format("#h:#m")) --> 1:35
 
 ##### Creating Timers
 ```lua
--- (howLong : number, type : string, step, startAt)
-local myTimer = RoTime.new().Timer(1, "minute", 1, 0)
+-- (howLong : number, finish: number, increment: number?)
+local myTimer = RoTime.new().Timer(0, 10)
+
+myTimer.Changed:Connect(function(elapsedTime)
+    print("It's been " .. elapsedTime .. " seconds since start!")
+end)
+
+myTimer.Completed:Connect(function(elapsedTime, startTime)
+    print("It's been " .. elapsedTime .. " seconds since start, and started at " .. startTime .. " seconds!")
+end)
+
+myTimer:Start()
 ```
 
 ##### Functions
