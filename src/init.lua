@@ -1,4 +1,3 @@
---!strict
 --- @class RoTime
 
 --[=[
@@ -78,6 +77,34 @@ function RoTime.new(): Types.RoTime
 	})
 
 	return self
+end
+
+--[=[
+	Gets the amount of time between two numbers. (Seconds)
+	@param firstUnix number
+	@param secondUnix number
+	@return string
+
+	@since 2.0.0
+	@within RoTime
+]=]
+function RoTime.getHumanTimestamp(firstUnix: number, secondUnix: number)
+	local diff = math.abs(firstUnix - secondUnix)
+	local finalStr = {}
+
+	-- 16m 52s
+	local keys = Table.Reverse(Table.Keys(Settings.timesTable))
+	for i = 1, #keys do
+		local key = keys[i]
+		local data = Settings.timesTable[key]
+		local format = string.sub(string.lower(data), 1, 1)
+		local div = math.floor(diff / data)
+
+		diff -= data * div
+		table.insert(finalStr, div .. format)
+	end
+
+	return table.concat(finalStr, " ")
 end
 
 --// Private Functions \\--
@@ -244,8 +271,8 @@ end
 
 --[=[
 	Takes a future time and calculates the difference, returning time duration.
-	@param input string
-	@param format string?
+	@param unix number
+	@param isMillisecond boolean?
 	@return number
 
 	@since 2.0.0
@@ -354,20 +381,16 @@ function Class:getTimestamp()
 		return tostring(value)
 	end
 
-	local formatted = dateData.Year
-		.. "-"
-		.. addZeroInFront(dateData.Month)
-		.. "-"
-		.. addZeroInFront(dateData.Day)
-		.. "T"
-		.. addZeroInFront(dateData.Hour)
-		.. ":"
-		.. addZeroInFront(dateData.Minute)
-		.. ":"
-		.. addZeroInFront(dateData.Second)
-		.. "."
-		.. dateData.Millisecond
-		.. "Z"
+	local formatted = string.format(
+		"%d-%d-%dT%d:%d:%d.%dZ",
+		dateData.Year,
+		addZeroInFront(dateData.Month),
+		addZeroInFront(dateData.Day),
+		addZeroInFront(dateData.Hour),
+		addZeroInFront(dateData.Minute),
+		addZeroInFront(dateData.Second),
+		dateData.Millisecond
+	)
 
 	return formatted
 end
