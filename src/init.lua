@@ -126,15 +126,12 @@ end
 	@since 2.0.0
 	@within RoTime
 ]=]
-function Class:_getDayOfTheYear()
-	-- Get month number
-	-- monthNum -= 1 (if past feb then 2)
-	-- dayNum = monthNum * 31 (get days since start of year)
-	-- use datetime to get current day count, add to dayNum
-	-- possible issue: if its feb then we're fucked
-
-	local currentMonthNum, currentDayNum = table.unpack(string.split(self:format("#mm #dd"), " "))
+function Class:_getDayOfTheYear(): { currentCount: number, fullYear: number }
+	local formatted = self:format("#mm #dd")
+	local split = string.split(formatted, " ")
+	local currentMonthNum, currentDayNum = table.unpack(split)
 	currentMonthNum, currentDayNum = tonumber(currentMonthNum), tonumber(currentDayNum)
+
 	local toSubtract = (currentMonthNum > 2) and 2 or 1
 	local isLeapYear = self:isLeapYear()
 
@@ -150,6 +147,25 @@ function Class:_getDayOfTheYear()
 		currentCount = dayNum,
 		fullYear = isLeapYear and 366 or 365,
 	}
+end
+
+--[=[
+	Adds a zero in front of a number. (Used for formatting)
+
+	@private
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:_addZeroInFront(value: any): string
+	if tonumber(value) == nil then
+		return value
+	end
+
+	if tonumber(value) < 10 and tonumber(value) >= 0 then
+		value = "0" .. value
+	end
+
+	return value
 end
 
 --[=[
@@ -206,12 +222,14 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 		elseif token == "timezone" then
 			insert(token, tostring(self._timezone.name))
 		elseif token == "week_year" then
-			local currentDays = self:_getDayOfTheYear()
-			insert(token, tostring(math.ceil(currentDays.currentCount / 7)))
+			local daysOfTheYear = self:_getDayOfTheYear()
+			insert(token, tostring(math.ceil(daysOfTheYear.currentCount / 7)))
 		elseif token == "year_day" then
-			-- day 100 / 365
-			local currentDays = self:_getDayOfTheYear()
-			insert(token, tostring(currentDays))
+			local daysOfTheYear = self:_getDayOfTheYear()
+			insert(token, tostring(daysOfTheYear.currentCount))
+		elseif token == "max_year_days" then
+			local daysOfTheYear = self:_getDayOfTheYear()
+			insert(token, tostring(daysOfTheYear.fullYear))
 		elseif token == "unix" then
 			insert(token, tostring(self._dt.UnixTimestamp))
 		elseif token == "unix_ms" then
@@ -397,6 +415,30 @@ function Class:getTime()
 end
 
 --[=[
+	Gets a specific formatting code's value.
+
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:get(...: { string }): ...string
+	local codes = { ... }
+	local vals = {}
+
+	for _, v in pairs(codes) do
+		local code = (string.sub(v, 1, 1) == "#") and v or "#" .. v
+
+		local tokens = Tokenizer(code)
+		local information = self:_getTokenInformation(Table.Map(tokens, function(value)
+			return (value.expected == "Unknown") and value.code or value.expected
+		end))
+
+		table.insert(vals, table.unpack(Table.Values(information)))
+	end
+
+	return table.unpack(vals)
+end
+
+--[=[
 	Gets the format used for timestamps.
 	@return string
 
@@ -406,21 +448,14 @@ end
 function Class:getTimestamp()
 	local dateData = self:getDateTime():ToUniversalTime()
 
-	local function addZeroInFront(value: number)
-		if value < 10 then
-			return "0" .. tostring(value)
-		end
-		return tostring(value)
-	end
-
 	local formatted = string.format(
 		"%d-%d-%dT%d:%d:%d.%dZ",
 		dateData.Year,
-		addZeroInFront(dateData.Month),
-		addZeroInFront(dateData.Day),
-		addZeroInFront(dateData.Hour),
-		addZeroInFront(dateData.Minute),
-		addZeroInFront(dateData.Second),
+		self:_addZeroInFront(dateData.Month),
+		self:_addZeroInFront(dateData.Day),
+		self:_addZeroInFront(dateData.Hour),
+		self:_addZeroInFront(dateData.Minute),
+		self:_addZeroInFront(dateData.Second),
 		dateData.Millisecond
 	)
 
@@ -633,8 +668,8 @@ function Class:format(input: string): string
 			return result
 		end
 
-		if value.tokenType == "number" and tonumber(result) < 10 and tonumber(result) >= 0 then
-			result = "0" .. result
+		if value.tokenType == "number" then
+			result = self:_addZeroInFront(result)
 		end
 
 		return result

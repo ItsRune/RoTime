@@ -51,6 +51,7 @@ return {
 		["dd"] = { expectedType = "day_short", Type = "number" },
 		["dddd"] = { expectedType = "day_long", Type = "string" },
 		["yd"] = { expectedType = "year_day", Type = "number" },
+		["myd"] = { expectedType = "max_year_days", Type = "number" },
 		["yy"] = { expectedType = "year_short", Type = "number" },
 		["yyyy"] = { expectedType = "year_long", Type = "number" },
 		["z"] = { expectedType = "timezone", Type = "string" },
