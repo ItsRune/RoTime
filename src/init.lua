@@ -286,6 +286,7 @@ end
 	@param timezoneName string
 	@return RoTime
 
+	@tag Chainable
 	@since 2.0.0
 	@within RoTime
 ]=]
@@ -650,7 +651,6 @@ end
 	@param input string
 	@return string
 
-	@tag Chainable
 	@since 2.0.0
 	@within RoTime
 ]=]
