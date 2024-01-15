@@ -5,8 +5,11 @@ return {
 		resultShouldIncludeUnknownTokens = true,
 	},
 
-	RegularExpressions = {
-		"[%d%d%d%d]%-[%d%d]%-[%d%d]T[%d%d]:[%d%d]:[%d%d]Z", -- 2020-01-02T10:30:45Z
+	tokensRequiringFormatting = {
+		-- Formatting includes: 0 in front of lonely numbers
+		"hour_24",
+		"minute",
+		"second",
 	},
 
 	timesTable = {

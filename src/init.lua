@@ -120,6 +120,39 @@ function Class:_warn(...: string)
 end
 
 --[=[
+	Gets the current day out of a full year. ex: 100/365
+
+	@private
+	@since 2.0.0
+	@within RoTime
+]=]
+function Class:_getDayOfTheYear()
+	-- Get month number
+	-- monthNum -= 1 (if past feb then 2)
+	-- dayNum = monthNum * 31 (get days since start of year)
+	-- use datetime to get current day count, add to dayNum
+	-- possible issue: if its feb then we're fucked
+
+	local currentMonthNum, currentDayNum = table.unpack(string.split(self:format("#mm #dd"), " "))
+	currentMonthNum, currentDayNum = tonumber(currentMonthNum), tonumber(currentDayNum)
+	local toSubtract = (currentMonthNum > 2) and 2 or 1
+	local isLeapYear = self:isLeapYear()
+
+	local monthNum = currentMonthNum - toSubtract
+	local dayNum = monthNum * 31
+
+	if toSubtract == 2 then
+		dayNum += isLeapYear and 22 or 21
+	end
+
+	dayNum += currentDayNum
+	return {
+		currentCount = dayNum,
+		fullYear = isLeapYear and 366 or 365,
+	}
+end
+
+--[=[
 	Gets a token's information.
 
 	@private
@@ -173,13 +206,12 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 		elseif token == "timezone" then
 			insert(token, tostring(self._timezone.name))
 		elseif token == "week_year" then
-			-- local firstThursday = weekDayNumber + ((weekDayNumber + 6) % 7)
-			insert(token, tostring("Not_implemented"))
+			local currentDays = self:_getDayOfTheYear()
+			insert(token, tostring(math.ceil(currentDays.currentCount / 7)))
 		elseif token == "year_day" then
 			-- day 100 / 365
-			local timeFrame = self:toNow("1/1", "#mm/#dd")
-			local difference = self:getDateTime().UnixTimestamp - timeFrame
-			insert(token, tostring(math.floor(difference / Settings.timesTable.Day)))
+			local currentDays = self:_getDayOfTheYear()
+			insert(token, tostring(currentDays))
 		elseif token == "unix" then
 			insert(token, tostring(self._dt.UnixTimestamp))
 		elseif token == "unix_ms" then
@@ -508,8 +540,14 @@ Class.sub = Class.subtract
 	@within RoTime
 ]=]
 function Class:set(input: string, format: string)
-	assert(typeof(input) == "string", "error 1")
-	assert(typeof(format) == "string", "error 2")
+	assert(
+		typeof(input) == "string",
+		string.format("Input string for ':set' expected 'string', got '%s'", typeof(input))
+	)
+	assert(
+		typeof(format) == "string",
+		string.format("Format string for ':set' expected 'string', got '%s'", typeof(format))
+	)
 
 	local tokens = Tokenizer(format)
 	local parsed = Parser(input, false, tokens)
@@ -589,7 +627,17 @@ function Class:format(input: string): string
 	end))
 
 	local resultingData = Table.Map(tokens, function(value)
-		return bulkData[(value.expected == "Unknown") and value.code or value.expected]
+		local result = bulkData[(value.expected == "Unknown") and value.code or value.expected]
+
+		if value["needsFormatting"] ~= true then
+			return result
+		end
+
+		if value.tokenType == "number" and tonumber(result) < 10 and tonumber(result) >= 0 then
+			result = "0" .. result
+		end
+
+		return result
 	end)
 
 	return table.concat(resultingData, "")
