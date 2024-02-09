@@ -13,13 +13,13 @@ return {
 	},
 
 	timesTable = {
-		Second = 1,
-		Minute = 60,
-		Hour = 3600,
-		Day = 86400,
-		Week = 604800,
-		Month = 2628000,
-		Year = 31536000,
+		Second = { "s", 1 },
+		Minute = { "m", 60 },
+		Hour = { "h", 3600 },
+		Day = { "d", 86400 },
+		Week = { "w", 604800 },
+		Month = { "mo", 2628000 },
+		Year = { "y", 31536000 },
 	},
 
 	addOrRemoveTypes = {

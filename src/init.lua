@@ -83,22 +83,31 @@ end
 	Gets the amount of time between two numbers. (Seconds)
 	@param firstUnix number
 	@param secondUnix number
+	@param formattingType "default" | "full"
 	@return string
 
 	@since 2.0.0
 	@within RoTime
 ]=]
-function RoTime.getHumanTimestamp(firstUnix: number, secondUnix: number)
+function RoTime.getHumanTimestamp(firstUnix: number, secondUnix: number, formattingType: "default" | "full"?)
+	formattingType = formattingType or "default"
 	local diff = math.abs(firstUnix - secondUnix)
 	local finalStr = {}
 
-	-- 16m 52s
+	-- Default version: 1h 16m 52s
+	-- Full version: 1 hour 16 minutes 52 seconds
 	local keys = Table.Reverse(Table.Keys(Settings.timesTable))
 	for i = 1, #keys do
 		local key = keys[i]
 		local data = Settings.timesTable[key]
-		local format = string.sub(string.lower(data), 1, 1)
 		local div = math.floor(diff / data)
+		local format
+
+		if formattingType == "default" then
+			format = data[1]
+		elseif formattingType == "full" then
+			format = string.format(" %s%s", string.lower(key), (div > 1) and "s" or "")
+		end
 
 		diff -= data * div
 		table.insert(finalStr, div .. format)

@@ -52,6 +52,7 @@ export type Timer = {
 }
 
 export type RoTime = {
+	getHumanTimestamp: (first: number, second: number, formattingType: "default" | "full"?) -> string,
 	Timer: (start: number, finish: number, increment: number?) -> Timer,
 
 	isLeapYear: (self: RoTime) -> boolean,
@@ -59,6 +60,7 @@ export type RoTime = {
 	_getTokenInformation: (tokenExpected: { string }) -> { [string]: string | number },
 	getCalender: (
 	) -> {
+		self: RoTime,
 		amountOfDays: number,
 		year: number,
 		isLeapYear: boolean,
