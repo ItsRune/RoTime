@@ -5,6 +5,9 @@
 	@within RoTime
 ]=]
 
+--// Services \\--
+local RunService = game:GetService("RunService")
+
 --// Variables \\--
 local Settings = require(script.Settings)
 local Tokenizer = require(script.Tokenize)
@@ -141,17 +144,18 @@ function Class:_getDayOfTheYear(): { currentCount: number, fullYear: number }
 	local currentMonthNum, currentDayNum = table.unpack(split)
 	currentMonthNum, currentDayNum = tonumber(currentMonthNum), tonumber(currentDayNum)
 
-	local toSubtract = (currentMonthNum > 2) and 2 or 1
+	local toSubtract = (currentMonthNum > 2) and 1 or 0
 	local isLeapYear = self:isLeapYear()
 
 	local monthNum = currentMonthNum - toSubtract
 	local dayNum = monthNum * 31
 
-	if toSubtract == 2 then
+	if toSubtract == 1 then
 		dayNum += isLeapYear and 22 or 21
 	end
 
-	dayNum += currentDayNum
+	dayNum -= 1
+
 	return {
 		currentCount = dayNum,
 		fullYear = isLeapYear and 366 or 365,
@@ -288,6 +292,36 @@ function Class:addTimezone(timezoneName: string, timezoneOffset: number)
 
 	Settings.Timezones[timezoneName] = timezoneOffset
 	return self
+end
+
+--[=[
+	Gets a player's local timezone.
+	@return string | "Unknown"
+
+	@client
+	@since 2.1.0
+	@within RoTime
+]=]
+function Class:getLocalTimezone(): string
+	assert(RunService:IsClient(), "'getLocalTimezone' can only be ran on the client!")
+
+	local rawUniverse = DateTime.now():ToUniversalTime()
+	local rawUserTime = DateTime.now():ToLocalTime()
+
+	-- Since timezones are just offsets of minutes & hours, we can do the difference to find theirs.
+	local theirTimezoneOffset = tonumber(
+		string.format("%d.%d", rawUserTime.Hour - rawUniverse.Hour, (rawUniverse.Minute - rawUserTime.Minute) / 60)
+	)
+
+	for timezoneName: string, timezoneOffset: number in pairs(Settings.Timezones) do
+		if theirTimezoneOffset ~= timezoneOffset then
+			continue
+		end
+
+		return timezoneName
+	end
+
+	return "Unknown"
 end
 
 --[=[
@@ -577,22 +611,20 @@ Class.sub = Class.subtract
 --[=[
 	Sets the time to the specified input and format.
 	@param input string
-	@param format string?
+	@param format string? Defaults to '#mm/#dd/#yyyy #hh:#m:#s'
 	@return RoTime
 
 	@tag Chainable
 	@since 2.0.0
 	@within RoTime
 ]=]
-function Class:set(input: string, format: string)
+function Class:set(input: string, format: string?)
 	assert(
 		typeof(input) == "string",
 		string.format("Input string for ':set' expected 'string', got '%s'", typeof(input))
 	)
-	assert(
-		typeof(format) == "string",
-		string.format("Format string for ':set' expected 'string', got '%s'", typeof(format))
-	)
+
+	format = format or "#mm/#dd/#yyyy #hh:#m:#s"
 
 	local tokens = Tokenizer(format)
 	local parsed = Parser(input, false, tokens)

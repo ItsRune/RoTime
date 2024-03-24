@@ -9,6 +9,14 @@
       }
     },
 
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "clientTest": {
+          "$path": "tests/test.client.lua"
+        }
+      }
+    },
+
     "Workspace": {
       "$properties": {
         "FilteringEnabled": true
