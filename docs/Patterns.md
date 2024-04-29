@@ -18,8 +18,9 @@ Formatting patterns are a way to format time. For example, if you wanted to form
 | `#mm` | The month of the year | Number | `1` |
 | `#mmm` | Shortened month of the year | String | `Jan` |
 | `#mmmm` | Full month of the year | String | `January` |
-| `#dd` | Shortened day of the month | String | `Mon` |
-| `#dddd` | Full day of the month | String | `Monday` |
+| `#d` | Day number of the month | Number | `1` |
+| `#dd` | Shortened day name | String | `Mon` |
+| `#dddd` | Full day name | String | `Monday` |
 | `#yd` | Gets the day of the year (1/365) | Number | `1` |
 | `#myd` | Gets the max amount of days in the year | Number | `365` |
 | `#yyyy` | The full year | Number | `2021` |
@@ -29,4 +30,4 @@ Formatting patterns are a way to format time. For example, if you wanted to form
 | `#ww` | Gets the amount of weeks it's been since January | Number | `3` |
 | `#u` | The unix timestamp | Number | `1705303405` |
 | `#uu` | The unix timestamp (Milliseconds) | Number | `1705303405915` |
-| `#a` | The AM/PM of the time | String | `AM` |
+| `#a` | The AM/PM of the time | String | `AM` OR `PM` |

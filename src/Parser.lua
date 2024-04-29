@@ -14,6 +14,7 @@ local function Parse(
 ): {
 	{
 		value: (number | string)?,
+		pattern: string,
 		code: string,
 	}?
 }
@@ -36,6 +37,7 @@ local function Parse(
 		if currentToken.expected == "Unknown" then
 			if returnUnknownCharacters then
 				table.insert(parsed, {
+					pattern = currentToken.code,
 					value = character,
 					code = "Unknown",
 				})
@@ -50,6 +52,7 @@ local function Parse(
 				num = tonumber(takenFromString)
 
 				table.insert(parsed, {
+					pattern = currentToken.code,
 					value = num,
 					code = currentToken.code,
 				})
@@ -67,6 +70,7 @@ local function Parse(
 
 			if not isOk then
 				table.insert(parsed, {
+					pattern = currentToken.code,
 					value = takenFromString,
 					code = currentToken.code,
 				})

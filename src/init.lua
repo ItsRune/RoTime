@@ -5,9 +5,6 @@
 	@within RoTime
 ]=]
 
---// Services \\--
-local RunService = game:GetService("RunService")
-
 --// Variables \\--
 local Settings = require(script.Settings)
 local Tokenizer = require(script.Tokenize)
@@ -227,6 +224,70 @@ function Class:_addZeroInFront(value: any): string
 end
 
 --[=[
+	Checks for daylight savings and adds the appropriate offset to the current timezone.
+
+	@private
+	@since 2.1.0
+	@within RoTime
+]=]
+function Class:_checkForDaylightSavings(): ()
+	if table.find(Settings.timezonesIgnoreDST, self._timezone.Name) ~= nil then
+		return
+	end
+
+	local savedDate = self:getDate() .. " " .. self:getTime()
+	local marchCalendar = self:set("3-1", "#mm-#d"):getCalendar()
+	local novemberCalendar = self:set("11-1", "#mm-#d"):getCalendar()
+
+	local currentMonth = tonumber(string.split(savedDate, "/")[2])
+	local currentDay = tonumber(string.split(savedDate, "/")[1])
+	local currentHour = tonumber(string.split(string.split(savedDate, " ")[2], ":")[1])
+
+	if currentMonth < 3 or currentMonth > 11 then
+		return
+	end
+
+	local secondSundayInMarch, firstSundayInNovember = -1, -1
+	local passedFirstSunday = false
+	for i = 1, #marchCalendar.days do
+		local data = marchCalendar[i]
+
+		if data.dayName == "Sunday" then
+			if not passedFirstSunday then
+				passedFirstSunday = true
+				continue
+			end
+
+			secondSundayInMarch = i
+			break
+		end
+	end
+
+	for i = 1, #novemberCalendar.days do
+		local data = novemberCalendar[i]
+
+		if data.dayName == "Sunday" then
+			firstSundayInNovember = i
+			break
+		end
+	end
+
+	if
+		(currentMonth > 3 and currentMonth < 11)
+		or (currentMonth == 3 and (currentDay > secondSundayInMarch or (currentDay == secondSundayInMarch and currentHour >= 2)))
+		or (
+			currentMonth == 11
+			and (currentDay < firstSundayInNovember or (currentDay == firstSundayInNovember and currentHour < 2))
+		)
+	then
+		self._timezone.offset += 1
+		self._timezone.name = string.gsub(self._timezone.name, "ST", "DT")
+	end
+
+	self:set(savedDate, "#d/#mm/#yyyy #hh:#m:#s")
+end
+
+--[=[
 	Gets a token's information.
 	@return { [string]: string }
 
@@ -254,15 +315,19 @@ function Class:_getTokenInformation(tokenExpected: { string }): { [string]: stri
 			local result = (timeValueTable.Hour + 1) % 12
 			insert(token, tostring((result == 0) and 12 or result))
 		elseif token == "hour_24" then
-			insert(token, tostring(timeValueTable.Hour + 1))
+			insert(token, tostring(timeValueTable.Hour))
+		elseif token == "ampm" then
+			insert(token, timeValueTable.Hour >= 12 and "PM" or "AM")
 		elseif token == "minute" then
 			insert(token, tostring(timeValueTable.Minute))
 		elseif token == "second" then
 			insert(token, tostring(timeValueTable.Second))
 		elseif token == "millis" then
 			insert(token, tostring(timeValueTable.Millisecond))
-		elseif token == "day_short" then
+		elseif token == "day_num" then
 			insert(token, tostring(timeValueTable.Day))
+		elseif token == "day_short" then
+			insert(token, string.sub(tostring(Settings.Names.weekDays[timeValueTable.Day]), 1, 3))
 		elseif token == "day_long" then
 			insert(token, tostring(Settings.Names.weekDays[weekDayNumber]))
 		elseif token == "year_long" then
@@ -319,6 +384,8 @@ function Class:timezone(newTimezone: string)
 	end
 
 	self._timezone = timezoneData
+	self:_checkForDaylightSavings()
+
 	return self
 end
 
@@ -366,8 +433,6 @@ end
 	@within RoTime
 ]=]
 function Class:getLocalTimezone(): string
-	assert(RunService:IsClient(), "'getLocalTimezone' can only be ran on the client!")
-
 	local rawUniverse = DateTime.now():ToUniversalTime()
 	local rawUserTime = DateTime.now():ToLocalTime()
 
@@ -466,7 +531,7 @@ end
 	@within RoTime
 ]=]
 function Class:getDate()
-	return self:format("#dd/#mm/#yyyy")
+	return self:format("#d/#mm/#yyyy")
 end
 
 --[=[
@@ -670,7 +735,8 @@ function Class:set(input: string, format: string?)
 		"hour_12",
 		"month_long",
 		"month_short",
-		"millis",
+		"day_short",
+		"day_long",
 		"ampm",
 		"timezone",
 		"week_year", -- Not implemented
@@ -678,7 +744,7 @@ function Class:set(input: string, format: string?)
 	}
 
 	for _, data: { value: string | number, code: string } in pairs(parsed) do
-		local patternData = Settings.Patterns[data.code]
+		local patternData = Settings.Patterns[data.pattern]
 
 		if not patternData then
 			continue
@@ -697,7 +763,7 @@ function Class:set(input: string, format: string?)
 			tbl.minute = math.clamp(data.value, 0, 60)
 		elseif token == "second" then
 			tbl.second = math.clamp(data.value, 0, 60)
-		elseif token == "day_short" or token == "day_long" then
+		elseif token == "day_num" then
 			tbl.day = math.clamp(data.value, 0, 31)
 		elseif token == "year_short" then
 			tbl.year = (data.value + 2000)
@@ -705,6 +771,8 @@ function Class:set(input: string, format: string?)
 			tbl.year = data.value
 		elseif token == "month" then
 			tbl.month = math.clamp(data.value, 1, 12)
+		elseif token == "millis" then
+			tbl.millisecond = math.clamp(data.value, 1, 999)
 		end
 	end
 

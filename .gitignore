@@ -10,3 +10,7 @@
 # Roblox Studio lock files
 /*.rbxlx.lock
 /*.rbxl.lock
+
+# Node stuffz
+/timezoneBuilder_node.js
+/node_modules

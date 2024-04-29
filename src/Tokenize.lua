@@ -11,6 +11,7 @@ local function tokenize(input: string): {
 			tokenType: string,
 			indexStart: number,
 			indexEnd: number,
+			needsFormatting: boolean?,
 		}
 	}?
 }
