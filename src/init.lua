@@ -6,12 +6,12 @@
 ]=]
 
 --// Variables \\--
-local Settings = require(script.Settings)
-local Tokenizer = require(script.Tokenize)
-local Parser = require(script.Parser)
-local Types = require(script.Types)
-local Table = require(script.Table)
-local Timer = require(script.Timer)
+local Settings = require("Settings")
+local Tokenizer = require("Tokenize")
+local Parser = require("Parser")
+local Types = require("Types")
+local Table = require("Table")
+local Timer = require("Timer")
 
 --// Module Setup \\--
 local RoTime = {}

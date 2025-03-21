@@ -19,9 +19,6 @@
 ]=]
 local TableUtil = {}
 
-local HttpService = game:GetService("HttpService")
-local rng = Random.new()
-
 --[=[
 	@within TableUtil
 	@function Copy
@@ -441,81 +438,6 @@ end
 
 --[=[
 	@within TableUtil
-	@function Shuffle
-	@param tbl table
-	@param rngOverride Random?
-	@return table
-
-	Shuffles the table.
-
-	```lua
-	local t = {1, 2, 3, 4, 5, 6, 7, 8, 9}
-	local shuffled = TableUtil.Shuffle(t)
-	print(shuffled) --> e.g. {9, 4, 6, 7, 3, 1, 5, 8, 2}
-	```
-
-	:::note Arrays only
-	This function works on arrays, but not dictionaries.
-]=]
-local function Shuffle<T>(tbl: { T }, rngOverride: Random?): { T }
-	assert(type(tbl) == "table", "First argument must be a table")
-	local shuffled = table.clone(tbl)
-	local random = if typeof(rngOverride) == "Random" then rngOverride else rng
-	for i = #tbl, 2, -1 do
-		local j = random:NextInteger(1, i)
-		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
-	end
-	return shuffled
-end
-
---[=[
-	@within TableUtil
-	@function Sample
-	@param tbl table
-	@param sampleSize number
-	@param rngOverride Random?
-	@return table
-
-	Returns a random sample of the table.
-
-	```lua
-	local t = {1, 2, 3, 4, 5, 6, 7, 8, 9}
-	local sample = TableUtil.Sample(t, 3)
-	print(sample) --> e.g. {6, 2, 5}
-	```
-
-	:::note Arrays only
-	This function works on arrays, but not dictionaries.
-]=]
-local function Sample<T>(tbl: { T }, size: number, rngOverride: Random?): { T }
-	assert(type(tbl) == "table", "First argument must be a table")
-	assert(type(size) == "number", "Second argument must be a number")
-
-	-- If given table is empty, just return a new empty table:
-	local len = #tbl
-	if len == 0 then
-		return {}
-	end
-
-	local shuffled = table.clone(tbl)
-	local sample = table.create(size)
-	local random = if typeof(rngOverride) == "Random" then rngOverride else rng
-
-	-- Clamp sample size to be no larger than the given table size:
-	size = math.clamp(size, 1, len)
-
-	for i = 1, size do
-		local j = random:NextInteger(i, len)
-		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
-	end
-
-	table.move(shuffled, 1, size, 1, sample)
-
-	return sample
-end
-
---[=[
-	@within TableUtil
 	@function Flat
 	@param tbl table
 	@param depth number?
@@ -871,30 +793,6 @@ local function IsEmpty(tbl: { any }): boolean
 	return next(tbl) == nil
 end
 
---[=[
-	@within TableUtil
-	@function EncodeJSON
-	@param value any
-	@return string
-
-	Proxy for [`HttpService:JSONEncode`](https://developer.roblox.com/en-us/api-reference/function/HttpService/JSONEncode).
-]=]
-local function EncodeJSON(value: any): string
-	return HttpService:JSONEncode(value)
-end
-
---[=[
-	@within TableUtil
-	@function DecodeJSON
-	@param value any
-	@return string
-
-	Proxy for [`HttpService:JSONDecode`](https://developer.roblox.com/en-us/api-reference/function/HttpService/JSONDecode).
-]=]
-local function DecodeJSON(str: string): any
-	return HttpService:JSONDecode(str)
-end
-
 TableUtil.Copy = Copy
 TableUtil.Sync = Sync
 TableUtil.Reconcile = Reconcile
@@ -906,8 +804,6 @@ TableUtil.Reduce = Reduce
 TableUtil.Assign = Assign
 TableUtil.Extend = Extend
 TableUtil.Reverse = Reverse
-TableUtil.Shuffle = Shuffle
-TableUtil.Sample = Sample
 TableUtil.Flat = Flat
 TableUtil.FlatMap = FlatMap
 TableUtil.Keys = Keys
@@ -919,7 +815,5 @@ TableUtil.Truncate = Truncate
 TableUtil.Zip = Zip
 TableUtil.Lock = Lock
 TableUtil.IsEmpty = IsEmpty
-TableUtil.EncodeJSON = EncodeJSON
-TableUtil.DecodeJSON = DecodeJSON
 
 return TableUtil

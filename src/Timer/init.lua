@@ -1,6 +1,6 @@
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
-local Signal = require(script.Signal)
+local Signal = require("Signal")
 
 --- @class Timer
 

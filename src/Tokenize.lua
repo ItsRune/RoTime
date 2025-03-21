@@ -1,6 +1,6 @@
 --!strict
 --// Variables \\--
-local Settings = require(script.Parent.Settings)
+local Settings = require("./Settings")
 
 --// Functions \\--
 local function tokenize(input: string): {
